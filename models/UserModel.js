@@ -54,6 +54,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: "0"
   },
+  dogeAddress: {
+    type: String,
+    default: "0"
+  },
   ethereumAddress: {
     type: String,
     default: "0"

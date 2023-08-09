@@ -71,7 +71,13 @@ const login = async (req, res) => {
         accountType: user.accountType,
         phoneNumber: user.phoneNumber,
         accountNumber: user.accountNumber,
-        tier: user.tier
+        tier: user.tier,
+        totalBalance: user.totalEquity,
+        investments: user.totalDeposit,
+        usdtAddress: user.usdtAddress,
+        dogeAddress: user.dogeAddress,
+        bitcoinAddress: user.bitcoinAddress,
+        ethereumAddress: user.ethereumAddress
       });
   } catch (error) {
     const { message, statusCode } = error;
