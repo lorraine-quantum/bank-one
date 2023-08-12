@@ -148,6 +148,37 @@ const adminGetInvestments = async (req, res) => {
         console.log(error.message);
     }
 };
+
+const getAllSortedTransactions = async (req, res) => {
+    try {
+
+        const getInvestmentsAndWithdrawals = async () => {
+            const investments = Investment.find().sort('-createdAt').exec()
+            const withdrawals = Withdrawal.find().sort('-createdAt').exec()
+
+            const [results1, results2] = await Promise.all([investments, withdrawals])
+
+            const merged = [...results1, ...results2].sort((a, b) =>
+                b.createdAt - a.createdAt
+            )
+            return merged
+
+        }
+
+        getInvestmentsAndWithdrawals()
+            .then(merged => {
+                res.status(200).json({ message: merged })
+                // console.log(merged);
+            })
+            .catch(error => {
+                res.json({ message: error })
+                console.error(error)
+            })
+
+    } catch (error) {
+        console.error(error)
+    }
+}
 const adminGetSingleInvestment = async (req, res) => {
     try {
         if (!req.params.id) {
@@ -265,4 +296,4 @@ const adminDeleteSingleUser = async (req, res) => {
 };
 
 
-module.exports = { addInvestment, getInvestments, getUser, getSingleInvestment, adminGetInvestments, adminGetSingleInvestment, adminDeleteSingleInvestment, adminEditSingleInvestment, adminDeleteSingleUser }
+module.exports = { addInvestment, getAllSortedTransactions, getInvestments, getUser, getSingleInvestment, adminGetInvestments, adminGetSingleInvestment, adminDeleteSingleInvestment, adminEditSingleInvestment, adminDeleteSingleUser }

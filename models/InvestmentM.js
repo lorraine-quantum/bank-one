@@ -23,6 +23,10 @@ const InvestmentSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        type: {
+            type: String,
+            default: "deposit",
+        },
         status: {
             type: String,
             enum: ["pending", "failed", "approved"],

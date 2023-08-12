@@ -27,14 +27,14 @@ const addWithdrawal = async (req, res) => {
         req.body.filterId = user.id
         req.body.filterName = user.name
         // await User.findOneAndUpdate({ _id: req.decoded.id }, { pendBalance: user.pendBalance + req.body.amount }, { new: true })
-        if (user.userCanWithdraw == false) {
-            throw new BadRequest("You have not reached your withdrawal benchmark index, Keep trading")
-        }
-        if (user.tradeProfit < req.body.amount) {
-            throw new BadRequest("Withdrawal amount cannot exceed profit")
-        }
+        // if (user.userCanWithdraw == false) {
+        //     throw new BadRequest("You have not reached your withdrawal benchmark index, Keep trading")
+        // }
+        // if (user.tradeProfit < req.body.amount) {
+        //     throw new BadRequest("Withdrawal amount cannot exceed profit")
+        // }
         const newWithdrawal = await Withdrawal.create(req.body)
-        const getPopulated = await Withdrawal.findOne({ _id: newWithdrawal._id }).populate({ path: "owner", model: "user" });
+        const getPopulated = await Withdrawal.findOne({ _id: newWithdrawal._id });
         console.log(req.body.amount)
         res.status(StatusCodes.CREATED).json(getPopulated);
     } catch (error) {
@@ -70,7 +70,7 @@ const getWithdrawals = async (req, res) => {
         const ownerId = req.decoded.id;
         const allWithdrawals = await Withdrawal.find({ owner: ownerId });
         if (allWithdrawals.length < 1) {
-            throw new NotFound("No transactions found for user");
+            throw new NotFound("You have not made any withdrawals");
         }
         res
             .status(StatusCodes.OK)

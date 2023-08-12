@@ -59,7 +59,7 @@ app.get("/test-upload-ruby", (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/card", auth, cardRoutes);
 app.use("/invest", auth, investmentRoutes);
-// app.use("/withdrawal", auth, withdrawalRoutes);
+app.use("/withdrawal", auth, withdrawalRoutes);
 // app.use("/upload", uploadRoutes);
 // app.use("/auth", auth, modifyUserRoutes);
 
