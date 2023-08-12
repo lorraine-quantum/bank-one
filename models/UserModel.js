@@ -96,7 +96,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: "point-believe-twenty-open-rail-pool"
   },
-  tradeProfit: {
+  totalProfit: {
     type: Number,
     default: 0,
   },
