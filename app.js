@@ -22,7 +22,7 @@ const auth = require("./middleware/authentication");
 const adminAuthMiddleware = require("./middleware/admin-auth");
 
 //routes
-const transactionRoutes = require('./routes/transactionR')
+const depositRoutes = require('./routes/depositR')
 const withdrawalRoutes = require('./routes/withdrawalR')
 const cardRoutes = require('./routes/cardR')
 const investmentRoutes = require('./routes/investmentRoute')
@@ -57,9 +57,10 @@ app.get("/test-upload-ruby", (req, res) => {
 
 // routes
 app.use("/auth", authRoutes);
-app.use("/card", auth, cardRoutes);
-app.use("/invest", auth, investmentRoutes);
-app.use("/withdrawal", auth, withdrawalRoutes);
+app.use("/card", cardRoutes);
+app.use("/invest", investmentRoutes);
+app.use("/withdrawal", withdrawalRoutes);
+app.use("/deposit", depositRoutes);
 // app.use("/upload", uploadRoutes);
 // app.use("/auth", auth, modifyUserRoutes);
 
@@ -67,7 +68,9 @@ app.use("/admin/auth", adminAuth);
 app.get('/', (req, res) => {
   res.json({ welcome: 'All about banking' })
 })
-app.use("/", adminAuthMiddleware, adminRoutes);
+// app.use("/", adminAuthMiddleware, adminRoutes);
+app.use(notFoundMiddleware);
+// app.use()
 
 
 const port = process.env.PORT || 3000;
@@ -90,4 +93,3 @@ const start = async () => {
 };
 
 start();
-app.use(notFoundMiddleware);

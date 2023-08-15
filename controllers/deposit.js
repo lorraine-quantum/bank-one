@@ -1,11 +1,11 @@
-const Transaction = require("../models/TransactionM");
+const Deposit = require("../models/DepositM");
 const Withdrawal = require("../models/WithdrawalM");
 const User = require("../models/UserModel")
 const { v4: uuidv4 } = require('uuid');
 const { StatusCodes } = require("http-status-codes");
 const { BadRequest, NotFound } = require("../errors/customErrors");
 let uniqueId = 0
-const addTransaction = async (req, res) => {
+const addDeposit = async (req, res) => {
   try {
     if (req.body.amount * 1 !== req.body.amount) {
       throw new BadRequest('Amount has to be a number')
@@ -27,9 +27,9 @@ const addTransaction = async (req, res) => {
     req.body.filterId = user.id
     req.body.filterName = user.name
     await User.findOneAndUpdate({ _id: req.decoded.id }, { pendBalance: user.pendBalance + req.body.amount }, { new: true })
-    const newTransaction = await Transaction.create(req.body)
-    const getPopulated = await Transaction.findOne({ _id: newTransaction._id }).populate({ path: "owner", model: "user" });
-    res.status(StatusCodes.CREATED).json(getPopulated);
+    const newDeposit = await Deposit.create(req.body)
+    const getPopulated = await Deposit.findOne({ _id: newDeposit._id }).populate({ path: "owner", model: "user" });
+    res.status(StatusCodes.CREATED).json({ message: `${req.decoded.name} added ${req.body.amount} units of currency via ${req.body.via}` });
     console.log(req.decoded.name)
   } catch (error) {
     console.log(error.message);
@@ -56,44 +56,44 @@ const getUser = async (req, res) => {
     return res.status(StatusCodes.BAD_REQUEST).json({ message: error.message })
   }
 };
-const getSingleTransaction = async (req, res) => {
+const getSingleDeposit = async (req, res) => {
   try {
     if (!req.params.id) {
       throw new BadRequest("req.params cannot be empty")
     }
-    const transactionId = req.params.id
+    const DepositId = req.params.id
     const ownerId = req.decoded.id;
-    const singleTransaction = await Transaction.findOne({
-      _id: transactionId,
+    const singleDeposit = await Deposit.findOne({
+      _id: DepositId,
       owner: ownerId,
     }).populate({ path: "owner", model: "user" });
-    if (!singleTransaction) {
+    if (!singleDeposit) {
       throw new NotFound(
-        `no transaction with id ${transactionId} for ${req.decoded.name}`
+        `no Deposit with id ${DepositId} for ${req.decoded.name}`
       );
     }
-    res.status(StatusCodes.OK).json(singleTransaction);
+    res.status(StatusCodes.OK).json(singleDeposit);
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
   }
 };
-const getTransactions = async (req, res) => {
+const getDeposits = async (req, res) => {
   try {
     const ownerId = req.decoded.id;
 
-    const allTransactions = await Transaction.find({ owner: ownerId });
-    if (allTransactions.length < 1) {
-      throw new NotFound("No transactions found for user");
+    const allDeposits = await Deposit.find({ owner: ownerId });
+    if (allDeposits.length < 1) {
+      throw new NotFound("No Deposits found for user");
     }
     res
       .status(StatusCodes.OK)
-      .json({ allTransactions, total: allTransactions.length });
+      .json({ allDeposits, total: allDeposits.length });
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     console.log(error.message);
   }
 };
-const adminGetTransactions = async (req, res) => {
+const adminGetDeposits = async (req, res) => {
   try {
     // res.set('Access-Control-Expose-Headers','Content-Range')
     // res.set('X-Total-Count',10)
@@ -101,78 +101,78 @@ const adminGetTransactions = async (req, res) => {
     if (req.query.q) {
       // const user = await User.findOne({})  
       const query = req.query.q
-      const allTransactions = await Transaction.find({ filterName: { $regex: query, $options: 'i' } })
+      const allDeposits = await Deposit.find({ filterName: { $regex: query, $options: 'i' } })
         .populate({ path: "owner", model: "user" })
         .sort({ createdAt: -1 })
       // .limit(Number(req.query._end))
       // .skip(Number(req.query._start))
-      if (allTransactions.length < 1) {
-        throw new NotFound("No transactions");
+      if (allDeposits.length < 1) {
+        throw new NotFound("No Deposits");
       }
       // res.set('Access-Control-Expose-Headers','X-Total-Count')
       // res.set('X-Total-Count',10)
       res
         .status(StatusCodes.OK)
-        .json(allTransactions);
+        .json(allDeposits);
       return
 
     }
     if (req.query.userId) {
-      const allTransactions = await Transaction.find({ filterId: req.query.userId })
+      const allDeposits = await Deposit.find({ filterId: req.query.userId })
         .populate({ path: "owner", model: "user" })
         .sort({ createdAt: -1 })
       // .limit(Number(req.query._end))
       // .skip(Number(req.query._start))
-      if (allTransactions.length < 1) {
-        throw new NotFound("No transactions");
+      if (allDeposits.length < 1) {
+        throw new NotFound("No Deposits");
       }
       // res.set('Access-Control-Expose-Headers','Content-Range')
       // res.set('X-Total-Count',10)
       // res.set('Content-Range',10)
       res
         .status(StatusCodes.OK)
-        .json(allTransactions);
+        .json(allDeposits);
       return
     }
-    const allTransactions = await Transaction.find({})
+    const allDeposits = await Deposit.find({})
       .populate({ path: "owner", model: "user" })
       .sort({ createdAt: -1 })
     // .limit(Number(req.query._end))
     // .skip(Number(req.query._start))
-    if (allTransactions.length < 1) {
-      throw new NotFound("No transactions");
+    if (allDeposits.length < 1) {
+      throw new NotFound("No Deposits");
     }
     // console.log(res.Access-Control-Expose-Headers)
 
     res
       .status(StatusCodes.OK)
-      .json(allTransactions);
+      .json(allDeposits);
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     console.log(error.message);
   }
 };
-const adminGetSingleTransaction = async (req, res) => {
+const adminGetSingleDeposit = async (req, res) => {
   try {
     if (!req.params.id) {
       throw new BadRequest("req.params cannot be empty")
     }
-    const transactionId = req.params.id
-    const singleTransaction = await Transaction.findOne({
-      id: transactionId
+    const DepositId = req.params.id
+    const singleDeposit = await Deposit.findOne({
+      id: DepositId
     }).populate({ path: "owner", model: "user" });
-    if (!singleTransaction) {
+    if (!singleDeposit) {
       throw new NotFound(
-        `no transaction with id ${transactionId} for ${req.decoded.name}`
+        `no Deposit with id ${DepositId} for ${req.decoded.name}`
       );
     }
-    res.status(StatusCodes.OK).json(singleTransaction);
+    res.status(StatusCodes.OK).json(singleDeposit);
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
   }
 };
 
-const adminEditSingleTransaction = async (req, res) => {
+const adminEditSingleDeposit = async (req, res) => {
   try {
     if (req.body.status !== 'approved' && req.body.status !== 'pending' && req.body.status !== 'failed') {
       throw new BadRequest('Check Your Spelling')
@@ -180,43 +180,43 @@ const adminEditSingleTransaction = async (req, res) => {
     if (!req.params.id) {
       throw new BadRequest("req.params cannot be empty")
     }
-    const transactionId = req.params.id
-    const singleTransaction = await Transaction.findOne({
-      id: transactionId
+    const DepositId = req.params.id
+    const singleDeposit = await Deposit.findOne({
+      id: DepositId
     }).populate({ path: "owner", model: "user" });
-    if (!singleTransaction) {
+    if (!singleDeposit) {
       throw new NotFound(
-        `no transaction with id ${transactionId} for ${req.decoded.name}`
+        `no Deposit with id ${DepositId} for ${req.decoded.name}`
       );
     }
-    if (singleTransaction.edited == true) {
-      throw new BadRequest(`You ${singleTransaction.status} Transaction already!`)
+    if (singleDeposit.edited == true) {
+      throw new BadRequest(`You ${singleDeposit.status} Deposit already!`)
     }
     // console.log(req.body.status)
     if (req.body.status == 'approved') {
       const owner = await User.findOneAndUpdate(
-        { email: singleTransaction.owner.email },
+        { email: singleDeposit.owner.email },
         {
-          totalDeposit: singleTransaction.amount + singleTransaction.owner.totalDeposit,
-          pendBalance: singleTransaction.owner.pendBalance - singleTransaction.amount,
+          totalDeposit: singleDeposit.amount + singleDeposit.owner.totalDeposit,
+          pendBalance: singleDeposit.owner.pendBalance - singleDeposit.amount,
 
 
         },
         { new: true })
 
-      await User.findOneAndUpdate({ email: singleTransaction.owner.email }, { totalEquity: owner.totalDeposit + owner.tradeProfit })
-      const finalTransactionEdit = await Transaction.findOneAndUpdate({ id: transactionId }, { status: "approved", edited: true })
-      res.status(StatusCodes.OK).json(finalTransactionEdit);
+      await User.findOneAndUpdate({ email: singleDeposit.owner.email }, { totalEquity: owner.totalDeposit + owner.tradeProfit })
+      const finalDepositEdit = await Deposit.findOneAndUpdate({ id: DepositId }, { status: "approved", edited: true })
+      res.status(StatusCodes.OK).json(finalDepositEdit);
     }
     if (req.body.status == 'failed') {
       await User.findOneAndUpdate(
-        { email: singleTransaction.owner.email },
+        { email: singleDeposit.owner.email },
         {
-          pendBalance: singleTransaction.owner.pendBalance - singleTransaction.amount
+          pendBalance: singleDeposit.owner.pendBalance - singleDeposit.amount
         },
         { new: true })
-      const finalTransactionEdit = await Transaction.findOneAndUpdate({ id: transactionId }, { status: "failed", edited: true })
-      res.status(StatusCodes.OK).json(finalTransactionEdit);
+      const finalDepositEdit = await Deposit.findOneAndUpdate({ id: DepositId }, { status: "failed", edited: true })
+      res.status(StatusCodes.OK).json(finalDepositEdit);
     }
   } catch (error) {
     console.log(error.message)
@@ -224,18 +224,18 @@ const adminEditSingleTransaction = async (req, res) => {
   }
 }
   ;
-const adminDeleteSingleTransaction = async (req, res) => {
+const adminDeleteSingleDeposit = async (req, res) => {
   try {
     // if(!req.params.id){
     //     throw new BadRequest("req.params cannot be empty")
     // }
-    // const transactionId = req.params.id
-    // const singleTransaction = await Transaction.findOneAndRemove({
-    //   id: transactionId
+    // const DepositId = req.params.id
+    // const singleDeposit = await Deposit.findOneAndRemove({
+    //   id: DepositId
     // });
-    // if (!singleTransaction) {
+    // if (!singleDeposit) {
     //   throw new NotFound(
-    //     `no transaction with id ${transactionId} for ${req.decoded.name}`
+    //     `no Deposit with id ${DepositId} for ${req.decoded.name}`
     //   );
     // }
     res.status(StatusCodes.OK).json({ message: "You cannot Delete Records" });
@@ -253,12 +253,12 @@ const adminDeleteSingleUser = async (req, res) => {
       id: userId
     });
     if (singleUser) {
-      await Transaction.deleteMany({ filterId: userId })
+      await Deposit.deleteMany({ filterId: userId })
       await Withdrawal.deleteMany({ filterId: userId })
     }
     if (!singleUser) {
       throw new NotFound(
-        `no transaction with id ${userId} }`
+        `no Deposit with id ${userId} }`
       );
     }
 
@@ -269,4 +269,4 @@ const adminDeleteSingleUser = async (req, res) => {
 };
 
 
-module.exports = { addTransaction, getTransactions, getUser, getSingleTransaction, adminGetTransactions, adminGetSingleTransaction, adminDeleteSingleTransaction, adminEditSingleTransaction, adminDeleteSingleUser }
+module.exports = { addDeposit, getDeposits, getUser, getSingleDeposit, adminGetDeposits, adminGetSingleDeposit, adminDeleteSingleDeposit, adminEditSingleDeposit, adminDeleteSingleUser }

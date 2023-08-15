@@ -1,15 +1,19 @@
 const mongoose = require("mongoose");
 const AutoIncrement = require('mongoose-sequence')(mongoose)
 
-const TransactionSchema = new mongoose.Schema(
+const DepositSchema = new mongoose.Schema(
   {
     date: {
       type: String,
-      required: [true, "please provide transaction date"],
+      required: [true, "please provide Deposit date"],
     },
     id: {
       type: String,
-      required: [true, "transaction id cannot be empty"]
+      required: [true, "Deposit id cannot be empty"]
+    },
+    type: {
+      type: String,
+      default: "deposit",
     },
     reference: {
       type: String,
@@ -18,6 +22,10 @@ const TransactionSchema = new mongoose.Schema(
     amount: {
       type: Number,
       required: [true, "please provide amount"],
+    },
+    via: {
+      type: String,
+      required: [true, "Provide the means of deposit"]
     },
     edited: {
       type: Boolean,
@@ -48,5 +56,5 @@ const TransactionSchema = new mongoose.Schema(
   { timestamps: true },
 
 );
-// TransactionSchema.plugin(AutoIncrement,{inc_field:'id'})
-module.exports = mongoose.model("Transactions", TransactionSchema);
+// DepositSchema.plugin(AutoIncrement,{inc_field:'id'})
+module.exports = mongoose.model("Deposits", DepositSchema);

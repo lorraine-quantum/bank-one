@@ -1,4 +1,6 @@
 const route = require("express").Router();
+const auth = require('../middleware/authentication')
+route.use(auth)
 const {
     addInvestment, getAllSortedTransactions, getInvestments, getUser, getSingleInvestment
 } = require("../controllers/investmentController");

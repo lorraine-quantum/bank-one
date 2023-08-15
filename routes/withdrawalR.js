@@ -1,4 +1,6 @@
 const route = require("express").Router();
+const auth = require('../middleware/authentication')
+route.use(auth)
 const {
     addWithdrawal, getWithdrawals, getSingleWithdrawal
 } = require("../controllers/withdrawal");

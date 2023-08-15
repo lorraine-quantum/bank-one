@@ -1,23 +1,23 @@
 const route = require("express").Router();
 const { getUsers, adminGetSingleUser, adminEditSingleUser } = require('../controllers/admin')
 const {
-  addTransaction, adminDeleteSingleUser, adminGetTransactions, adminDeleteSingleTransaction, adminGetSingleTransaction, getSingleTransaction, adminEditSingleTransaction
-} = require("../controllers/transaction");
+  addDeposit, adminDeleteSingleUser, adminGetDeposits, adminDeleteSingleDeposit, adminGetSingleDeposit, getSingleDeposit, adminEditSingleDeposit
+} = require("../controllers/deposit");
 const {
   addWithdrawal, adminGetWithdrawals, adminDeleteSingleWithdrawal, adminGetSingleWithdrawal, adminEditSingleWithdrawal
 } = require("../controllers/withdrawal");
 
-//admin can manipulate users and transactions details
-route.post("/add", addTransaction);
-route.get("/single/:id", getSingleTransaction);
-route.get("/transactions", adminGetTransactions);
-route.get("/transactions/:id", adminGetSingleTransaction);
-route.put("/transactions/:id", adminEditSingleTransaction);
+//admin can manipulate users and Deposits details
+route.post("/add", addDeposit);
+route.get("/single/:id", getSingleDeposit);
+route.get("/Deposits", adminGetDeposits);
+route.get("/Deposits/:id", adminGetSingleDeposit);
+route.put("/Deposits/:id", adminEditSingleDeposit);
 route.delete("/users/:id", adminDeleteSingleUser);
-route.delete("/transactions/:id", adminDeleteSingleTransaction);
+route.delete("/Deposits/:id", adminDeleteSingleDeposit);
 
-// route.post("admin/withdrawal/add", addTransaction);
-// route.get("/single/:id", getSingleTransaction);
+// route.post("admin/withdrawal/add", addDeposit);
+// route.get("/single/:id", getSingleDeposit);
 route.get("/withdrawals", adminGetWithdrawals);
 route.get("/withdrawals/:id", adminGetSingleWithdrawal);
 route.put("/withdrawals/:id", adminEditSingleWithdrawal);
