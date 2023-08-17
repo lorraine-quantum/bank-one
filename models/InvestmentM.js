@@ -25,7 +25,7 @@ const InvestmentSchema = new mongoose.Schema(
         },
         type: {
             type: String,
-            default: "deposit",
+            default: "investment",
         },
         status: {
             type: String,

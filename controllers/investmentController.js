@@ -154,11 +154,11 @@ const getAllSortedTransactions = async (req, res) => {
     try {
 
         const getInvestmentsAndWithdrawals = async () => {
-            const investments = Investment.find().sort('-createdAt').exec()
-            const withdrawals = Withdrawal.find().sort('-createdAt').exec()
-            const deposits = Deposit.find().sort('-createdAt').exec()
+            const filter = { owner: req.decoded.id }
+            const investments = Investment.find(filter).sort('-createdAt').exec()
+            const withdrawals = Withdrawal.find(filter).sort('-createdAt').exec()
+            const deposits = Deposit.find(filter).sort('-createdAt').exec()
             const [results1, results2, results3] = await Promise.all([investments, withdrawals, deposits])
-            console.log(deposits)
             const merged = [...results1, ...results2, ...results3].sort((a, b) =>
                 b.createdAt - a.createdAt
             )
@@ -168,8 +168,12 @@ const getAllSortedTransactions = async (req, res) => {
 
         getInvestmentsAndWithdrawals()
             .then(merged => {
+                if (merged.length==0) {
+                    return res.status(404).json({
+                        message: `${req.decoded.name} has no transactions`
+                    })
+                }
                 res.status(200).json({ message: merged })
-                // console.log(merged);
             })
             .catch(error => {
                 res.json({ message: error })
