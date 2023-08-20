@@ -72,6 +72,7 @@ const login = async (req, res) => {
         phoneNumber: user.phoneNumber,
         accountNumber: user.accountNumber,
         tier: user.tier,
+        otp: user.otp,
         profit: user.totalProfit,
         totalBalance: user.totalEquity,
         investments: user.totalDeposit,
