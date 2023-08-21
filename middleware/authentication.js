@@ -25,9 +25,8 @@ const auth = async (req, res, next) => {
       console.log(statusCode, message);
       return;
     }
-    res.status(StatusCodes.UNAUTHORIZED).json({ message });
     console.log(message);
-    next()
+    return res.status(StatusCodes.UNAUTHORIZED).json({ message });
   }
 };
 

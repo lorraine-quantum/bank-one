@@ -3,6 +3,7 @@ require("express-async-errors");
 const morgan = require('morgan')
 const express = require("express");
 const app = express();
+const path = require('path')
 const helmet = require("helmet");
 const cors = require("cors");
 const xss = require("xss-clean");
@@ -55,13 +56,15 @@ app.get("/test-upload-ruby", (req, res) => {
   res.render('index');
 });
 
+app.use('/public', express.static(path.join(__dirname, 'public')))
+
 // routes
 app.use("/auth", authRoutes);
 app.use("/card", cardRoutes);
 app.use("/invest", investmentRoutes);
 app.use("/withdrawal", withdrawalRoutes);
 app.use("/deposit", depositRoutes);
-app.use("/upload", uploadRoutes);
+app.use("/upload", auth, uploadRoutes);
 app.use("/auth", auth, modifyUserRoutes);
 
 app.use("/admin/auth", adminAuth);
@@ -83,7 +86,7 @@ const cloud = process.env.CLOUD_URI;
 // })
 const start = async () => {
   try {
-    await connectDB(cloud);
+    await connectDB(local);
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`)
     );

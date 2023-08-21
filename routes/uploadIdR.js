@@ -1,11 +1,14 @@
 const route = require('express').Router()
 const { uploadId } = require('../controllers/uploadIdC')
+// const User = require('../models/UserModel')
+
+
 route.post('/', (req, res) => {
     uploadId(req, res, (err) => {
-        console.log(req.file)
+        console.log("error:", req.fileValidationError);
         if (req.fileValidationError) {
             //  return   res.redirect('/uploadfailed')
-            console.log(req.fileValidationError)
+            // console.log(req.fileValidationError)
             return res.json({ message: req.fileValidationError })
         }
         if (!req.file) {
@@ -15,8 +18,11 @@ route.post('/', (req, res) => {
             return res.json({ msg: err })
         }
         else {
-            console.log(req.file)
-            return res.json({ message: ' Image Uploaded successful' })
+            console.log(req.file.filename, "filename")
+            const apiBaseUrl = `${req.protocol}://${req.get('host')}`
+            console.log(`${apiBaseUrl}/public/uploads/${req.file.filename}`);
+            res.json({ redirecturl: `${apiBaseUrl}/public/uploads/${req.file.filename}` })
+            // return res.redirect(`${apiBaseUrl}/public/uploads/${req.file.filename}`)
         }
     })
 })
