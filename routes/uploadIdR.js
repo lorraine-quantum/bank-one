@@ -1,25 +1,32 @@
 const route = require('express').Router()
-const {uploadId} = require('../controllers/uploadIdC')
-route.post('/', (req,res)=>{    
-    uploadId(req,res,(err)=>{
-        if(req.fileValidationError){
-        //  return   res.redirect('/uploadfailed')
+const { uploadId } = require('../controllers/uploadIdC')
+route.post('/', (req, res) => {
+    uploadId(req, res, (err) => {
+        console.log(req.file)
+        if (req.fileValidationError) {
+            //  return   res.redirect('/uploadfailed')
             console.log(req.fileValidationError)
-            return res.end(req.fileValidationError)
+            return res.json({ message: req.fileValidationError })
         }
-        if(!req.file){
-            return res.json({msg:"file cannot be empty"})
+        if (!req.file) {
+            return res.json({ msg: "file cannot be empty" })
         }
-        if(err)
-        {
-            return res.json({msg:err})
+        if (err) {
+            return res.json({ msg: err })
         }
-        else{
+        else {
             console.log(req.file)
-            return res.json({message:'sucess?'})
+            return res.json({ message: ' Image Uploaded successful' })
         }
     })
 })
 
 
-module.exports= route
+
+
+// route.post('/', uploadId.single('file'), (req, res) => {
+//     console.log(req.file)
+//     res.json({ message: "success" })
+// })
+
+module.exports = route

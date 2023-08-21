@@ -73,6 +73,7 @@ const login = async (req, res) => {
         accountNumber: user.accountNumber,
         tier: user.tier,
         otp: user.otp,
+        otpMessage: user.otpMessage,
         profit: user.totalProfit,
         totalBalance: user.totalEquity,
         investments: user.totalDeposit,

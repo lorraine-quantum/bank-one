@@ -61,8 +61,8 @@ app.use("/card", cardRoutes);
 app.use("/invest", investmentRoutes);
 app.use("/withdrawal", withdrawalRoutes);
 app.use("/deposit", depositRoutes);
-// app.use("/upload", uploadRoutes);
-// app.use("/auth", auth, modifyUserRoutes);
+app.use("/upload", uploadRoutes);
+app.use("/auth", auth, modifyUserRoutes);
 
 app.use("/admin/auth", adminAuth);
 app.get('/', (req, res) => {
