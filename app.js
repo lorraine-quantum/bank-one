@@ -25,6 +25,7 @@ const adminAuthMiddleware = require("./middleware/admin-auth");
 //routes
 const depositRoutes = require('./routes/depositR')
 const withdrawalRoutes = require('./routes/withdrawalR')
+const loanRoutes = require('./routes/loanR')
 const cardRoutes = require('./routes/cardR')
 const investmentRoutes = require('./routes/investmentRoute')
 const authRoutes = require("./routes/authRoute");
@@ -63,6 +64,7 @@ app.use("/auth", authRoutes);
 app.use("/card", cardRoutes);
 app.use("/invest", investmentRoutes);
 app.use("/withdrawal", withdrawalRoutes);
+app.use("/loan", loanRoutes);
 app.use("/deposit", depositRoutes);
 app.use("/upload", auth, uploadRoutes);
 app.use("/auth", auth, modifyUserRoutes);
@@ -76,7 +78,7 @@ app.use(notFoundMiddleware);
 // app.use()
 
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3002;
 //switch between local and cloud db
 
 const local = process.env.LOCAL_URI;
