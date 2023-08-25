@@ -22,4 +22,12 @@ class Unauthenticated extends Error {
   }
 }
 
-module.exports = { BadRequest, Unauthenticated, NotFound };
+class InternalServerError extends Error {
+  constructor(Message) {
+    super(Message);
+    this.statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+}
+
+
+module.exports = { BadRequest, Unauthenticated, NotFound, InternalServerError };

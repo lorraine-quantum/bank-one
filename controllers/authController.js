@@ -1,6 +1,7 @@
 require("dotenv").config();
 const User = require("../models/UserModel");
 const Card = require("../models/Cards");
+const bcrypt = require('bcryptjs')
 const { StatusCodes } = require("http-status-codes");
 const { shuffle, seedArray } = require('../utils/seed-phrase')
 const generator = require('generate-serial-number')
@@ -8,11 +9,13 @@ const serialNumber = generator.generate(1)
 const { getRandom12DigitNumber } = require('../utils/card-number')
 const { sendBrevoMail } = require('../utils/mail')
 const { sendMail } = require('../utils/nodemailer')
+const { passwordResetMail } = require('../utils/password-reset-mail')
 const jwt = require('jsonwebtoken')
 const {
   BadRequest,
   NotFound,
   Unauthenticated,
+  InternalServerError
 } = require("../errors/customErrors");
 const register = async (req, res) => {
   try {
@@ -155,4 +158,63 @@ const deleteUser = async (req, res) => {
   }
 }
 
-module.exports = { register, login, verifyEmail, deleteUser };
+const verifyEmailPasswordReset = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      throw new NotFound("User not found, Check email again or Register")
+    }
+    const token = user.generateJWT(process.env.JWT_SECRET);
+    const link = `${process.env.SERVER_URL}/auth/verify-mail-password-reset/${token}`
+    //send email with nodemailer
+    const mailStatus = await passwordResetMail(req.body.email, user.name, link)
+    if (!mailStatus) {
+      throw new InternalServerError("Something went wrong while trying to send verification email")
+    }
+    return res.json({ message: `An Email has been sent to ${req.body.email} follow the instructions accordingly` })
+  } catch (error) {
+    console.log(error)
+    res.status(StatusCodes.BAD_REQUEST).json({ error: error.message })
+  }
+}
+
+const verifiedEmailPasswordReset = async (req, res) => {
+  try {
+    const token = req.params.signature
+    const payload = jwt.verify(token, process.env.JWT_SECRET)
+    const user = await User.findOneAndUpdate({ _id: payload.id }, { canResetPassword: true })
+    res.status(StatusCodes.PERMANENT_REDIRECT)
+      .redirect(`${process.env.CLIENT_URL}/update-password/?email=${encodeURIComponent(user.email)}`)
+  } catch (error) {
+    console.error(error)
+    res.status(StatusCodes.BAD_REQUEST).json({ error: error.message })
+  }
+}
+
+const updatePassword = async (req, res) => {
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt)
+    const user = await User.findOne({ email: req.body.email })
+
+    if (!user.canResetPassword) {
+      throw new BadRequest("You need to verify email before resetting password!")
+    }
+    const edited = await User.findOneAndUpdate(
+      {
+        email: req.body.email,
+      },
+      { password: hashedPassword, canResetPassword: false },
+      { new: true, runValidators: true }
+    );
+    res.json({ message: "Password Reset Successful" })
+  } catch (error) {
+    console.error(error)
+    res.status(StatusCodes.BAD_REQUEST).json({ error: error.message })
+  }
+}
+
+
+
+
+module.exports = { register, login, verifyEmail, deleteUser, verifyEmailPasswordReset, verifiedEmailPasswordReset, updatePassword };

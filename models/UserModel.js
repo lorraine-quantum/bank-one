@@ -79,6 +79,10 @@ const UserSchema = new mongoose.Schema({
     required: [true, "password cannot be empty"],
     minlength: 6,
   },
+  canResetPassword: {
+    type: Boolean,
+    default: false
+  },
   address: {
     type: String,
     default: "Update your Address",
