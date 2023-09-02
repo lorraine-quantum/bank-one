@@ -1,15 +1,16 @@
 const Deposit = require("../models/DepositM");
 const Withdrawal = require("../models/WithdrawalM");
+const { uploadId } = require('./uploadIdC')
 const User = require("../models/UserModel")
 const { v4: uuidv4 } = require('uuid');
 const { StatusCodes } = require("http-status-codes");
 const { BadRequest, NotFound } = require("../errors/customErrors");
 let uniqueId = 0
 const addDeposit = async (req, res) => {
+
   try {
-    if (req.body.amount * 1 !== req.body.amount) {
-      throw new BadRequest('Amount has to be a number')
-    }
+
+
     uniqueId++
     let day = new Date().getDate()
     let month = new Date().getMonth()
@@ -22,15 +23,59 @@ const addDeposit = async (req, res) => {
     req.body.reference = "#" + req.decoded.name.slice(0, 3) + "/" + uuidv4()
     const user = await User.findOne({ _id: req.decoded.id })
     if (!user) {
-      return res.status(StatusCodes.CREATED).json({ message: "user not found" })
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "user not found" })
     }
     req.body.filterId = user.id
     req.body.filterName = user.name
-    await User.findOneAndUpdate({ _id: req.decoded.id }, { pendBalance: user.pendBalance + req.body.amount }, { new: true })
+    // await User.findOneAndUpdate({ _id: req.decoded.id }, { pendBalance: user.pendBalance + req.body.amount }, { new: true })
     const newDeposit = await Deposit.create(req.body)
     const getPopulated = await Deposit.findOne({ _id: newDeposit._id }).populate({ path: "owner", model: "user" });
-    res.status(StatusCodes.CREATED).json({ message: `${req.decoded.name} added ${req.body.amount} units of currency via ${req.body.via}` });
-    console.log(req.decoded.name)
+
+    // upload image
+    uploadId(req, res, async (err) => {
+      try {
+
+        if (!req.body.amount) {
+          throw new BadRequest('Amount not supplied')
+        }
+
+        if (!req.body.via) {
+          throw new BadRequest('Deposit means not supplied')
+        }
+
+        req.body.amount = Number(req.body.amount)
+        if (req.body.amount * 1 !== req.body.amount) {
+          throw new BadRequest('Amount has to be a number')
+        }
+        if (req.fileValidationError) {
+          return res.json({ message: req.fileValidationError })
+        }
+        if (!req.file) {
+          await Deposit.findOneAndRemove({ id: newDeposit.id })
+          throw new BadRequest('File cannot be empty')
+        }
+        if (err) {
+          return res.status(StatusCodes.BAD_REQUEST).json({ msg: err })
+        }
+        else {
+          console.log(req.file.filename, "filename")
+
+          const apiBaseUrl = `${req.protocol}://${req.get('host')}`
+          const imageUrl = `${apiBaseUrl}/public/uploads/${req.file.filename}`
+          const updatedDeposit = await Deposit.findOneAndUpdate({ id: newDeposit.id }, { imageUrl, amount: req.body.amount, via: req.body.via }, { new: true })
+          const { via, amount } = updatedDeposit
+          console.log(updatedDeposit.imageUrl, via, amount);
+          res.json({ redirecturl: `${apiBaseUrl}/public/uploads/${req.file.filename}` })
+          // return res.redirect(`${apiBaseUrl}/public/uploads/${req.file.filename}`)
+        }
+      }
+      catch (err) {
+        console.log(err.message);
+        return res.status(StatusCodes.BAD_REQUEST).json({ err: err.message })
+      }
+    })
+    // res.status(StatusCodes.CREATED).json({ message: `${req.decoded.name} added ${req.body.amount} units of currency via ${req.body.via}` });
+    // console.log(req.decoded.name)
   } catch (error) {
     console.log(error.message);
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
@@ -81,7 +126,7 @@ const getDeposits = async (req, res) => {
   try {
     const ownerId = req.decoded.id;
 
-    const allDeposits = await Deposit.find({ owner: ownerId });
+    const allDeposits = await Deposit.find({ owner: ownerId }).sort({ createdAt: "-1" });
     if (allDeposits.length < 1) {
       throw new NotFound("No Deposits found for user");
     }

@@ -21,11 +21,9 @@ const DepositSchema = new mongoose.Schema(
     },
     amount: {
       type: Number,
-      required: [true, "please provide amount"],
     },
     via: {
       type: String,
-      required: [true, "Provide the means of deposit"]
     },
     edited: {
       type: Boolean,
@@ -42,6 +40,9 @@ const DepositSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       required: [true, "please provide owner"],
+    },
+    imageUrl: {
+      type: String
     },
     filterId: {
       type: Number,
