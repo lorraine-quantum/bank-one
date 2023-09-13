@@ -68,7 +68,7 @@ app.use("/loan", loanRoutes);
 app.use("/deposit", depositRoutes);
 app.use("/upload", auth, uploadRoutes);
 app.use("/auth", auth, modifyUserRoutes);
-
+app.use('/', adminAuthMiddleware, adminRoutes)
 app.use("/admin/auth", adminAuth);
 app.get('/', (req, res) => {
   res.json({ welcome: 'All about banking' })

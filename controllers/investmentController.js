@@ -168,12 +168,12 @@ const getAllSortedTransactions = async (req, res) => {
 
         getInvestmentsAndWithdrawals()
             .then(merged => {
-                if (merged.length==0) {
+                if (merged.length == 0) {
                     return res.status(404).json({
                         message: `${req.decoded.name} has no transactions`
                     })
                 }
-                res.status(200).json({ message: merged })
+                res.status(200).json({ allTransactions: merged })
             })
             .catch(error => {
                 res.json({ message: error })

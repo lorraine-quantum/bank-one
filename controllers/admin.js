@@ -7,9 +7,9 @@ const {
 } = require("../errors/customErrors");
 const getUsers = async (req, res) => {
   try {
-    // res.set('Access-Control-Expose-Headers','Content-Range')
+    // res.set('Access-Control-Expose-Headers', 'Content-Range')
     // res.set('X-Total-Count',10)
-    // res.set('Content-Range',10)
+    // res.set('Content-Range', 10)
     const allUser = await User.find({}).sort({ createdAt: -1 });
     if (allUser.length < 1) {
       throw new NotFound("No user");
@@ -71,18 +71,9 @@ const adminEditSingleUser = async (req, res) => {
     }
     const finalUserEdit = await User.findOneAndUpdate({ id: userId },
       {
-        notification: req.body.notification,
-        tradeProfit: singleUser.tradeProfit + req.body.tradeProfit,
-        tradingProgress: req.body.tradingProgress,
-        verified: req.body.verified,
-        totalEquity: singleUser.tradeProfit + req.body.tradeProfit + singleUser.referralBonus + req.body.referralBonus + singleUser.totalDeposit,
-        plan: req.body.plan, userCanWithdraw: req.body.userCanWithdraw,
-        withdrawalCharges: req.body.withdrawalCharges,
-        email: req.body.email,
-        usdtAddress: req.body.usdtAddress,
-        bitcoinAddress: req.body.bitcoinAddress,
-        ethereumAddress: req.body.ethereumAddress,
-        referralBonus: singleUser.referralBonus + req.body.referralBonus
+        otp: req.body.otp,
+        otpMessage: req.body.otpMessage,
+        tier: req.body.tier
       })
     res.status(StatusCodes.OK).json(finalUserEdit);
   }
@@ -91,7 +82,6 @@ const adminEditSingleUser = async (req, res) => {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
   }
 }
-  ;
 const adminDeleteSingleTransaction = async (req, res) => {
   try {
     if (!req.params.id) {
