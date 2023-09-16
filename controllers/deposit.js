@@ -20,7 +20,7 @@ const addDeposit = async (req, res) => {
     req.body.date = date;
     req.body.id = uuidv4();
     //add the amount deposited to the total deposits field in the user schema
-    req.body.reference = "#" + req.decoded.name.slice(0, 3) + "/" + uuidv4()
+    req.body.reference = "#" + req.decoded.name.slice(0, 3) + "/" + uuidv4().substring(0, 5)
     const user = await User.findOne({ _id: req.decoded.id })
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "user not found" })
@@ -75,6 +75,40 @@ const addDeposit = async (req, res) => {
       }
     })
     // res.status(StatusCodes.CREATED).json({ message: `${req.decoded.name} added ${req.body.amount} units of currency via ${req.body.via}` });
+    // console.log(req.decoded.name)
+  } catch (error) {
+    console.log(error.message);
+    res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+  }
+};
+const adminAddDeposit = async (req, res) => {
+
+  try {
+
+
+    uniqueId++
+    let day = new Date().getDate()
+    let month = new Date().getMonth()
+    let year = new Date().getFullYear()
+    const date = `${day}-${month + 1}-${year}`
+    req.body.owner = req.decoded.id;
+    req.body.date = date;
+    req.body.id = uuidv4();
+    //add the amount deposited to the total deposits field in the user schema
+    req.body.reference = "#" + req.body.user.slice(0, 3) + "/" + uuidv4().substring(0, 5)
+    const user = await User.findOne({ email: req.body.user })
+    if (!user) {
+      return res.status(StatusCodes.NOT_FOUND).json({ message: "user not found" })
+    }
+    req.body.filterId = user.id
+    req.body.filterName = user.name
+    // await User.findOneAndUpdate({ _id: req.decoded.id }, { pendBalance: user.pendBalance + req.body.amount }, { new: true })
+
+    const newDeposit = await Deposit.create(req.body)
+    const getPopulated = await Deposit.findOne({ _id: newDeposit._id }).populate({ path: "owner", model: "user" });
+
+
+    res.status(StatusCodes.CREATED).json(getPopulated);
     // console.log(req.decoded.name)
   } catch (error) {
     console.log(error.message);
@@ -314,4 +348,4 @@ const adminDeleteSingleUser = async (req, res) => {
 };
 
 
-module.exports = { addDeposit, getDeposits, getUser, getSingleDeposit, adminGetDeposits, adminGetSingleDeposit, adminDeleteSingleDeposit, adminEditSingleDeposit, adminDeleteSingleUser }
+module.exports = { addDeposit, getDeposits, getUser, getSingleDeposit, adminAddDeposit, adminGetDeposits, adminGetSingleDeposit, adminDeleteSingleDeposit, adminEditSingleDeposit, adminDeleteSingleUser }

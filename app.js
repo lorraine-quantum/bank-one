@@ -68,8 +68,8 @@ app.use("/loan", loanRoutes);
 app.use("/deposit", depositRoutes);
 app.use("/upload", auth, uploadRoutes);
 app.use("/auth", auth, modifyUserRoutes);
-app.use('/', adminAuthMiddleware, adminRoutes)
 app.use("/admin/auth", adminAuth);
+app.use('/', adminAuthMiddleware, adminRoutes)
 app.get('/', (req, res) => {
   res.json({ welcome: 'All about banking' })
 })
@@ -88,7 +88,7 @@ const cloud = process.env.CLOUD_URI;
 // })
 const start = async () => {
   try {
-    await connectDB(cloud);
+    await connectDB(local);
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`)
     );
