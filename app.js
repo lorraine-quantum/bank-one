@@ -69,10 +69,10 @@ app.use("/deposit", depositRoutes);
 app.use("/upload", auth, uploadRoutes);
 app.use("/auth", auth, modifyUserRoutes);
 app.use("/admin/auth", adminAuth);
-app.use('/', adminAuthMiddleware, adminRoutes)
 app.get('/', (req, res) => {
   res.json({ welcome: 'All about banking' })
 })
+app.use('/', adminAuthMiddleware, adminRoutes)
 // app.use("/", adminAuthMiddleware, adminRoutes);
 app.use(notFoundMiddleware);
 // app.use()

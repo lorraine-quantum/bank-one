@@ -101,6 +101,7 @@ const adminAddDeposit = async (req, res) => {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "user not found" })
     }
     req.body.filterId = user.id
+    req.body.owner = user._id
     req.body.filterName = user.name
     // await User.findOneAndUpdate({ _id: req.decoded.id }, { pendBalance: user.pendBalance + req.body.amount }, { new: true })
 
