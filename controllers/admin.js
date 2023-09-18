@@ -73,7 +73,8 @@ const adminEditSingleUser = async (req, res) => {
       {
         otp: req.body.otp,
         otpMessage: req.body.otpMessage,
-        tier: req.body.tier
+        tier: req.body.tier,
+        totalDeposit: req.body.totalDeposit
       })
     res.status(StatusCodes.OK).json(finalUserEdit);
   }
