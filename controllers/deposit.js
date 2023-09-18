@@ -95,7 +95,7 @@ const adminAddDeposit = async (req, res) => {
     req.body.date = date;
     req.body.id = uuidv4();
     //add the amount deposited to the total deposits field in the user schema
-    req.body.reference = "#" + req.body.user.slice(0, 3) + "/" + uuidv4().substring(0, 5)
+    req.body.reference = "#" + uuidv4().substring(0, 8)
     const user = await User.findOne({ email: req.body.user })
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "user not found" })
@@ -162,12 +162,10 @@ const getDeposits = async (req, res) => {
     const ownerId = req.decoded.id;
 
     const allDeposits = await Deposit.find({ owner: ownerId }).sort({ createdAt: "-1" });
-    if (allDeposits.length < 1) {
-      throw new NotFound("No Deposits found for user");
-    }
+
     res
       .status(StatusCodes.OK)
-      .json({ allDeposits, total: allDeposits.length });
+      .json({ allDeposits });
   } catch (error) {
     res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     console.log(error.message);

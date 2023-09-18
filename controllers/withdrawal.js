@@ -69,9 +69,7 @@ const getWithdrawals = async (req, res) => {
     try {
         const ownerId = req.decoded.id;
         const allWithdrawals = await Withdrawal.find({ owner: ownerId });
-        if (allWithdrawals.length < 1) {
-            throw new NotFound("You have not made any withdrawals");
-        }
+
         res
             .status(StatusCodes.OK)
             .json({ allWithdrawals, total: allWithdrawals.length });

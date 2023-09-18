@@ -79,12 +79,10 @@ const getInvestments = async (req, res) => {
     try {
         const ownerId = req.decoded.id;
         const allInvestments = await Investment.find({ owner: ownerId });
-        if (allInvestments.length < 1) {
-            throw new NotFound("No Investments found for user");
-        }
+        
         res
             .status(StatusCodes.OK)
-            .json({ allInvestments, total: allInvestments.length });
+            .json({ allInvestments });
     } catch (error) {
         res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
         console.log(error.message);

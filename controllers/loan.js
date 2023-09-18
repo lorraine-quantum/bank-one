@@ -67,9 +67,7 @@ const getLoans = async (req, res) => {
     try {
         const ownerId = req.decoded.id;
         const allLoans = await Loan.find({ owner: ownerId });
-        if (allLoans.length < 1) {
-            throw new NotFound("You have not made any Loans");
-        }
+
         res
             .status(StatusCodes.OK)
             .json({ allLoans, total: allLoans.length });

@@ -96,6 +96,9 @@ const UserSchema = new mongoose.Schema({
   country: {
     type: String,
   },
+  region: {
+    type: String,
+  },
   seedPhrase: {
     type: String,
     default: "point-believe-twenty-open-rail-pool"
