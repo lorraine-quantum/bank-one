@@ -79,7 +79,7 @@ const getInvestments = async (req, res) => {
     try {
         const ownerId = req.decoded.id;
         const allInvestments = await Investment.find({ owner: ownerId });
-        
+
         res
             .status(StatusCodes.OK)
             .json({ allInvestments });
@@ -166,11 +166,7 @@ const getAllSortedTransactions = async (req, res) => {
 
         getInvestmentsAndWithdrawals()
             .then(merged => {
-                if (merged.length == 0) {
-                    return res.status(404).json({
-                        message: `${req.decoded.name} has no transactions`
-                    })
-                }
+
                 res.status(200).json({ allTransactions: merged })
             })
             .catch(error => {
