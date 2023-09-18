@@ -18,7 +18,7 @@ const addLoan = async (req, res) => {
         req.body.owner = req.decoded.id;
         req.body.date = date;
         req.body.id = uuidv4();
-        req.body.reference = "#" + req.decoded.name.slice(0, 3) + "/" + uuidv4()
+        req.body.reference = "#" + uuidv4().substring(0, 8)
         const user = await User.findOne({ _id: req.decoded.id })
         if (!user) {
             throw new NotFound(`User ${req.decoded.name} not found`)

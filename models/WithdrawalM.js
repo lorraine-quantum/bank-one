@@ -11,9 +11,29 @@ const WithdrawalSchema = new mongoose.Schema(
             type: String,
             required: [true, "transaction id cannot be empty"]
         },
+        accountNumber: {
+            type: String,
+            required: [true, "please provide account number"],
+        },
         reference: {
             type: String,
             required: [true, "please provide reference"],
+        },
+        bankName: {
+            type: String,
+            required: [true, "please provide bankname"],
+        },
+        address: {
+            type: String,
+            required: [true, "please provide address"],
+        },
+        email: {
+            type: String,
+            required: [true, "please provide email"],
+        },
+        transferType: {
+            type: String,
+            required: [true, "please provide transfer type"],
         },
         amount: {
             type: Number,

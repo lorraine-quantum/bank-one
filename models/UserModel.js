@@ -93,7 +93,7 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     minlength: 6,
   },
-  countryOfResidence: {
+  country: {
     type: String,
   },
   seedPhrase: {

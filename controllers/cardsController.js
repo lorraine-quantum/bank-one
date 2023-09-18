@@ -84,10 +84,6 @@ const getCards = async (req, res) => {
     try {
         const ownerId = req.decoded.id;
         const allCards = await Card.find({ owner: ownerId });
-        if (allCards.length < 1) {
-            throw new NotFound("No transactions found for user");
-        }
-
         const extractedData = allCards.map((newCard) => {
             return {
                 expiryDate: newCard.expiryDate,
@@ -101,7 +97,7 @@ const getCards = async (req, res) => {
         })
         res
             .status(StatusCodes.OK)
-            .json({ extractedData });
+            .json({ allCards: extractedData });
     } catch (error) {
         res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
         console.log(error.message);

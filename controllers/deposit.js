@@ -20,7 +20,7 @@ const addDeposit = async (req, res) => {
     req.body.date = date;
     req.body.id = uuidv4();
     //add the amount deposited to the total deposits field in the user schema
-    req.body.reference = "#" + req.decoded.name.slice(0, 3) + "/" + uuidv4().substring(0, 5)
+    req.body.reference = "#" + uuidv4().substring(0, 8)
     const user = await User.findOne({ _id: req.decoded.id })
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({ message: "user not found" })
@@ -274,17 +274,7 @@ const adminEditSingleDeposit = async (req, res) => {
     }
     // console.log(req.body.status)
     if (req.body.status == 'approved') {
-      const owner = await User.findOneAndUpdate(
-        { email: singleDeposit.owner.email },
-        {
-          totalDeposit: singleDeposit.amount + singleDeposit.owner.totalDeposit,
-          pendBalance: singleDeposit.owner.pendBalance - singleDeposit.amount,
 
-
-        },
-        { new: true })
-
-      await User.findOneAndUpdate({ email: singleDeposit.owner.email }, { totalEquity: owner.totalDeposit + owner.tradeProfit })
       const finalDepositEdit = await Deposit.findOneAndUpdate({ id: DepositId }, { status: "approved", edited: true })
       res.status(StatusCodes.OK).json(finalDepositEdit);
     }
