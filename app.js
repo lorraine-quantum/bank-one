@@ -33,6 +33,8 @@ const adminAuth = require("./routes/adminAuth");
 const uploadRoutes = require("./routes/uploadIdR")
 const modifyUserRoutes = require('./routes/modifyUserR')
 const adminRoutes = require('./routes/adminRoute')
+const getUser = require('./routes/getUser')
+
 // error handler
 const notFoundMiddleware = require("./middleware/not-found");
 const connectDB = require("./db/connect");
@@ -66,6 +68,7 @@ app.use("/invest", investmentRoutes);
 app.use("/withdrawal", withdrawalRoutes);
 app.use("/loan", loanRoutes);
 app.use("/deposit", depositRoutes);
+app.use("/tokenized-user", getUser);
 app.use("/upload", auth, uploadRoutes);
 app.use("/auth", auth, modifyUserRoutes);
 app.use("/admin/auth", adminAuth);

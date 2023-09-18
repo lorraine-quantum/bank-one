@@ -129,7 +129,24 @@ const getUser = async (req, res) => {
         `user not found`
       );
     }
-    return res.status(StatusCodes.OK).json(user);
+    return res.status(StatusCodes.OK).
+      json({
+        owner: user.name,
+        email: user.email,
+        accountType: user.accountType,
+        phoneNumber: user.phoneNumber,
+        accountNumber: user.accountNumber,
+        tier: user.tier,
+        otp: user.otp,
+        otpMessage: user.otpMessage,
+        profit: user.totalProfit,
+        totalBalance: user.totalEquity,
+        investments: user.totalDeposit,
+        usdtAddress: user.usdtAddress,
+        dogeAddress: user.dogeAddress,
+        bitcoinAddress: user.bitcoinAddress,
+        ethereumAddress: user.ethereumAddress
+      });
   }
   catch (error) {
     console.log(error)
@@ -160,9 +177,7 @@ const getSingleDeposit = async (req, res) => {
 const getDeposits = async (req, res) => {
   try {
     const ownerId = req.decoded.id;
-
     const allDeposits = await Deposit.find({ owner: ownerId }).sort({ createdAt: "-1" });
-
     res
       .status(StatusCodes.OK)
       .json({ allDeposits });
