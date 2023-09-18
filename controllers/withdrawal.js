@@ -72,7 +72,7 @@ const getWithdrawals = async (req, res) => {
 
         res
             .status(StatusCodes.OK)
-            .json({ allWithdrawals, total: allWithdrawals.length });
+            .json({ allWithdrawals });
     } catch (error) {
         res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
         console.log(error.message);
