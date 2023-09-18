@@ -123,7 +123,7 @@ const login = async (req, res) => {
         otpMessage: user.otpMessage,
         profit: user.totalProfit,
         totalBalance: user.totalEquity,
-        investments: user.totalDeposit,
+        totalDeposit: user.totalDeposit,
         usdtAddress: user.usdtAddress,
         dogeAddress: user.dogeAddress,
         bitcoinAddress: user.bitcoinAddress,
