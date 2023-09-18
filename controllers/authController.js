@@ -121,6 +121,8 @@ const login = async (req, res) => {
         tier: user.tier,
         otp: user.otp,
         otpMessage: user.otpMessage,
+        country: user.country,
+        region: user.region,
         profit: user.totalProfit,
         totalBalance: user.totalEquity,
         totalDeposit: user.totalDeposit,
