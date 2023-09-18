@@ -70,7 +70,7 @@ const getLoans = async (req, res) => {
 
         res
             .status(StatusCodes.OK)
-            .json({ allLoans, total: allLoans.length });
+            .json({ allLoans });
     } catch (error) {
         res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
         console.log(error.message);
