@@ -72,7 +72,7 @@ const adminEditSingleUser = async (req, res) => {
     const finalUserEdit = await User.findOneAndUpdate({ id: userId },
       {
         otp: req.body.otp,
-        otpMessage: req.body.otpMessage,
+        withdrawalLevel: req.body.withdrawalLevel,
         tier: req.body.tier,
         totalDeposit: req.body.totalDeposit
       })

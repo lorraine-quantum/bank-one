@@ -111,9 +111,15 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: "0000"
   },
-  otpMessage: {
+  withdrawalLevel: {
     type: String,
-    default: ""
+    default: "Level 1",
+    enum: ['Level 1', 'Level 2', 'Level 3']
+  },
+  otpLevel: {
+    type: String,
+    default: "Level 1",
+    enum: ['Level 1', 'Level 2', 'Level 3']
   },
   totalDeposit: {
     type: Number,

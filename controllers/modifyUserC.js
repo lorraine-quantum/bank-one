@@ -36,6 +36,52 @@ const editUser = async (req, res) => {
     return res.status(StatusCodes.BAD_REQUEST).json({ message: error.message })
   }
 };
+const checkOtp = async (req, res) => {
+  console.log("inside editToken")
+  try {
+    const ownerId = req.decoded.id;
+    const user = await User.findById(ownerId)
+    console.log(user.withdrawalLevel, user.otpLevel);
+
+    if (req.body.otp !== user.otp) {
+      throw new BadRequest("Invalid Otp")
+    }
+    let newOtpLevel;
+    if (user.otpLevel == "Level 1") {
+      newOtpLevel = "Level 2"
+      console.log("block 1")
+    }
+    if (user.otpLevel == "Level 2") {
+      newOtpLevel = "Level 3"
+      console.log("block 2")
+    }
+    if (user.otpLevel == "Level 3") {
+      newOtpLevel = "Level 1"
+      console.log("block 3")
+    }
+    if (user.withdrawalLevel !== user.otpLevel) {
+      throw new BadRequest("Otp level does not match withrawal level")
+    }
+    const edited = await User.findOneAndUpdate(
+      {
+        _id: ownerId,
+      },
+      { otpLevel: newOtpLevel },
+      { new: true, runValidators: true }
+    );
+    if (!edited) {
+      throw new NotFound(
+        `Token Expired`
+      );
+    }
+    console.log("edit success")
+    return res.status(StatusCodes.CREATED).json({ currentOtpLevel: edited.otpLevel });
+  }
+  catch (error) {
+    console.log("in edit error")
+    return res.status(StatusCodes.BAD_REQUEST).json({ message: error.message })
+  }
+};
 
 const editPassword = async (req, res) => {
   const seedPhrase = req.body.seedPhrase
@@ -121,4 +167,4 @@ const getUser = async (req, res) => {
     return res.status(StatusCodes.BAD_REQUEST).json({ message: error.message })
   }
 };
-module.exports = { editUser, deleteUser, editPassword }
+module.exports = { editUser, deleteUser, editPassword, checkOtp }
