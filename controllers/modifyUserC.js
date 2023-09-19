@@ -41,8 +41,9 @@ const checkOtp = async (req, res) => {
   try {
     const ownerId = req.decoded.id;
     const user = await User.findById(ownerId)
-    console.log(user.withdrawalLevel, user.otpLevel);
-
+    if (!user) {
+      throw new BadRequest("User not found")
+    }
     if (req.body.otp !== user.otp) {
       throw new BadRequest("Invalid Otp")
     }
