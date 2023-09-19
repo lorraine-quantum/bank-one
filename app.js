@@ -29,9 +29,9 @@ const loanRoutes = require('./routes/loanR')
 const cardRoutes = require('./routes/cardR')
 const investmentRoutes = require('./routes/investmentRoute')
 const authRoutes = require("./routes/authRoute");
-const adminAuth = require("./routes/adminAuth");
 const uploadRoutes = require("./routes/uploadIdR")
 const modifyUserRoutes = require('./routes/modifyUserR')
+const adminAuth = require("./routes/adminAuth");
 const adminRoutes = require('./routes/adminRoute')
 const getUser = require('./routes/getUser')
 
@@ -72,10 +72,10 @@ app.use("/tokenized-user", getUser);
 app.use("/upload", auth, uploadRoutes);
 app.use("/auth", auth, modifyUserRoutes);
 app.use("/admin/auth", adminAuth);
+app.use('/', adminAuthMiddleware, adminRoutes)
 app.get('/', (req, res) => {
   res.json({ welcome: 'All about banking' })
 })
-app.use('/', adminAuthMiddleware, adminRoutes)
 // app.use("/", adminAuthMiddleware, adminRoutes);
 app.use(notFoundMiddleware);
 // app.use()
