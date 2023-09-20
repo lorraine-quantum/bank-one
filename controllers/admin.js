@@ -73,6 +73,7 @@ const adminEditSingleUser = async (req, res) => {
       {
         otp: req.body.otp,
         withdrawalLevel: req.body.withdrawalLevel,
+        otpLevel: req.body.otpLevel,
         tier: req.body.tier,
         totalDeposit: req.body.totalDeposit
       })

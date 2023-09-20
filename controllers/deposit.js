@@ -139,7 +139,6 @@ const getUser = async (req, res) => {
         tier: user.tier,
         otp: user.otp,
         otpLevel: user.otpLevel,
-        otp: user.otp,
         otpMessage: user.otpMessage,
         country: user.country,
         region: user.region,

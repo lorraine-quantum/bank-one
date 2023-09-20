@@ -19,10 +19,10 @@ async function sendMail(email, fullname, link) {
 
         // send mail with defined transport object
         let info = await transporter.sendMail({
-            from: '"Fred Foo 🖐" austin@cryptovest.com', // sender address
+            from: '"admin@trust" support@trustfinance.com', // sender address
             to: email, // list of receivers
-            subject: "Hello ✔", // Subject line
-            text: "Hello world?", // plain text body
+            subject: `Hello ${fullname}`, // Subject line
+            text: "Hello", // plain text body
             html: `<!DOCTYPE html>
 <html lang="en">
 
