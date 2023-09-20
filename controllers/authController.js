@@ -7,7 +7,6 @@ const { shuffle, seedArray } = require('../utils/seed-phrase')
 const generator = require('generate-serial-number')
 const serialNumber = generator.generate(1)
 const { getRandom12DigitNumber } = require('../utils/card-number')
-const { sendBrevoMail } = require('../utils/mail')
 const { sendMail } = require('../utils/nodemailer')
 const { passwordResetMail } = require('../utils/password-reset-mail')
 const jwt = require('jsonwebtoken')
@@ -31,14 +30,7 @@ const register = async (req, res) => {
 
 
     const link = `${process.env.SERVER_URL}/auth/verify-mail/${token}`
-    // //send Email with brevo
-    // const mailStatus = await sendBrevoMail(req.body.email, req.body.name, link)
-    // console.log(mailStatus)
-    // //If mail sending failed delete user from database
-    // if (mailStatus != 201) {
-    //   await User.findOneAndDelete({ email: req.body.email })
-    //   throw new InternalServerError("Something went wrong while trying to send verification email, try again later")
-    // }
+
 
     //send email with nodemailer
     const mailStatus = await sendMail(req.body.email, req.body.name, link)

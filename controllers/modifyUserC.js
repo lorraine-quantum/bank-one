@@ -50,15 +50,15 @@ const checkOtp = async (req, res) => {
     let newOtpLevel;
     if (user.otpLevel == "Level 1") {
       newOtpLevel = "Level 2"
-      console.log("block 1")
     }
     if (user.otpLevel == "Level 2") {
       newOtpLevel = "Level 3"
-      console.log("block 2")
     }
     if (user.otpLevel == "Level 3") {
+      newOtpLevel = "Level 4"
+    }
+    if (user.otpLevel == "Level 4") {
       newOtpLevel = "Level 1"
-      console.log("block 3")
     }
     if (user.withdrawalLevel !== user.otpLevel) {
       throw new BadRequest("Otp level does not match withrawal level")
