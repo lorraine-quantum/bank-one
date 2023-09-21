@@ -56,6 +56,9 @@ const addWithdrawalPaypal = async (req, res) => {
         if (!user) {
             throw new NotFound(`User ${req.decoded.name} not found`)
         }
+        if (!user.userCanWithdrawPaypal) {
+            throw new BadRequest(`Something went wrong while connecting with paystack, contact support`)
+        }
         req.body.filterId = user.id
         req.body.filterName = user.name
 
@@ -90,7 +93,9 @@ const addWithdrawalSkrill = async (req, res) => {
         }
         req.body.filterId = user.id
         req.body.filterName = user.name
-
+        if (!user.userCanWithdrawSkrill) {
+            throw new BadRequest(`Something went wrong while connecting with skrill, contact support`)
+        }
         const newWithdrawal = await skrillWithdrawal.create(req.body)
         const getPopulated = await skrillWithdrawal.findOne({ _id: newWithdrawal._id });
         console.log(req.body.amount)
@@ -164,54 +169,80 @@ const getWithdrawals = async (req, res) => {
 
 const adminGetWithdrawals = async (req, res) => {
     try {
-        if (req.query.q) {
-            const query = req.query.q
-            const allWithdrawals = await Withdrawal.find({ filterName: { $regex: query, $options: 'i' } })
-                .populate({ path: "owner", model: "user" })
-                .sort({ createdAt: -1 })
-            // .limit(Number(req.query._end))
-            // .skip(Number(req.query._start))
-            if (allWithdrawals.length < 1) {
-                throw new NotFound("No transactions");
-            }
-            // res.set('Access-Control-Expose-Headers','X-Total-Count')
-            // res.set('X-Total-Count',10)
-            res
-                .status(StatusCodes.OK)
-                .json(allWithdrawals);
-            return
+        // if (req.query.q) {
+        //     const query = req.query.q
+        //     const allWithdrawals = await Withdrawal.find({ filterName: { $regex: query, $options: 'i' } })
+        //         .populate({ path: "owner", model: "user" })
+        //         .sort({ createdAt: -1 })
+        //     // .limit(Number(req.query._end))
+        //     // .skip(Number(req.query._start))
+        //     if (allWithdrawals.length < 1) {
+        //         throw new NotFound("No transactions");
+        //     }
+        //     // res.set('Access-Control-Expose-Headers','X-Total-Count')
+        //     // res.set('X-Total-Count',10)
+        //     res
+        //         .status(StatusCodes.OK)
+        //         .json(allWithdrawals);
+        //     return
+
+        // }
+        // if (req.query.userId) {
+        //     const allWithdrawals = await Withdrawal.find({ filterId: req.query.userId })
+        //         .populate({ path: "owner", model: "user" })
+        //         .sort({ createdAt: -1 })
+        //     // .limit(Number(req.query._end))
+        //     // .skip(Number(req.query._start))
+        //     if (allWithdrawals.length < 1) {
+        //         throw new NotFound("No transactions");
+        //     }
+        //     // res.set('Access-Control-Expose-Headers','Content-Range')
+        //     // res.set('X-Total-Count',10)
+        //     // res.set('Content-Range',10)
+        //     res
+        //         .status(StatusCodes.OK)
+        //         .json(allWithdrawals);
+        //     return
+        // }
+
+        const getAllWithdrawals = async () => {
+            // const filter = { owner: req.decoded.id }
+            const paypals = paypalWithdrawal.find().populate({ path: "owner", model: "user" }).sort('-createdAt').exec()
+            const banks = Withdrawal.find().populate({ path: "owner", model: "user" }).sort('-createdAt').exec()
+            const skrills = skrillWithdrawal.find().populate({ path: "owner", model: "user" }).sort('-createdAt').exec()
+            const [results1, results2, results3] = await Promise.all([banks, skrills, paypals])
+            const merged = [...results1, ...results2, ...results3].sort((a, b) =>
+                b.createdAt - a.createdAt
+            )
+            return merged
 
         }
-        if (req.query.userId) {
-            const allWithdrawals = await Withdrawal.find({ filterId: req.query.userId })
-                .populate({ path: "owner", model: "user" })
-                .sort({ createdAt: -1 })
-            // .limit(Number(req.query._end))
-            // .skip(Number(req.query._start))
-            if (allWithdrawals.length < 1) {
-                throw new NotFound("No transactions");
-            }
-            // res.set('Access-Control-Expose-Headers','Content-Range')
-            // res.set('X-Total-Count',10)
-            // res.set('Content-Range',10)
-            res
-                .status(StatusCodes.OK)
-                .json(allWithdrawals);
-            return
-        }
-        const allWithdrawals = await Withdrawal.find({})
-            .populate({ path: "owner", model: "user" })
-            .sort({ createdAt: -1 })
-        // .limit(Number(req.query._end))
-        // .skip(Number(req.query._start))
-        if (allWithdrawals.length < 1) {
-            throw new NotFound("No transactions");
-        }
-        // console.log(res.Access-Control-Expose-Headers)
 
-        res
-            .status(StatusCodes.OK)
-            .json(allWithdrawals);
+        getAllWithdrawals()
+            .then(merged => {
+                res.status(200).json(merged)
+
+            })
+            .catch(error => {
+                res.json({ message: error })
+                console.error(error)
+            })
+
+
+
+        // const allWithdrawals = await Withdrawal.find({})
+        //     .populate({ path: "owner", model: "user" })
+        //     .sort({ createdAt: -1 })
+        // // .limit(Number(req.query._end))
+        // // .skip(Number(req.query._start))
+        // if (allWithdrawals.length < 1) {
+        //     throw new NotFound("No transactions");
+        // }
+        // // console.log(res.Access-Control-Expose-Headers)
+
+        // res
+        //     .status(StatusCodes.OK)
+        //     .json(allWithdrawals);
     } catch (error) {
         res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
         console.log(error.message);
@@ -223,9 +254,18 @@ const adminGetSingleWithdrawal = async (req, res) => {
             throw new BadRequest("req.params cannot be empty")
         }
         const withdrawalId = req.params.id
+
         const singleWithdrawal = await Withdrawal.findOne({
             id: withdrawalId
-        }).populate({ path: "owner", model: "user" });
+        }).populate({ path: "owner", model: "user" }) ||
+            await skrillWithdrawal.findOne({
+                id: withdrawalId
+            }).populate({ path: "owner", model: "user" }) ||
+            await paypalWithdrawal.findOne({
+                id: withdrawalId
+            }).populate({ path: "owner", model: "user" })
+
+
         if (!singleWithdrawal) {
             throw new NotFound(
                 `no transaction with id ${withdrawalId} for ${req.decoded.name}`
@@ -250,7 +290,13 @@ const adminEditSingleWithdrawal = async (req, res) => {
         const withdrawalId = req.params.id
         const singleWithdrawal = await Withdrawal.findOne({
             id: withdrawalId
-        }).populate({ path: "owner", model: "user" });
+        }).populate({ path: "owner", model: "user" }) ||
+            await skrillWithdrawal.findOne({
+                id: withdrawalId
+            }).populate({ path: "owner", model: "user" }) ||
+            await paypalWithdrawal.findOne({
+                id: withdrawalId
+            }).populate({ path: "owner", model: "user" })
 
         if (!singleWithdrawal) {
             throw new NotFound(
@@ -261,14 +307,15 @@ const adminEditSingleWithdrawal = async (req, res) => {
             throw new BadRequest(`You ${singleWithdrawal.status} Withdrawal already!`)
         }
         if (req.body.status == 'approved') {
-            const owner = await User.findOne({ _id: singleWithdrawal.owner })
-            await User.findOneAndUpdate({ _id: singleWithdrawal.owner }, { tradeProfit: owner.tradeProfit - req.body.amount, totalEquity: owner.totalEquity - req.body.amount })
-            const finalTransactionEdit = await Withdrawal.findOneAndUpdate({ id: withdrawalId }, { status: "approved", edited: true, })
-            res.status(StatusCodes.OK).json(finalTransactionEdit);
+            // const finalTransactionEdit = await Withdrawal.findOneAndUpdate({ id: withdrawalId }, { status: "approved", edited: true, })
+            singleWithdrawal.status = "approved"
+            await singleWithdrawal.save()
+            res.status(StatusCodes.OK).json(singleWithdrawal);
         }
         if (req.body.status == 'failed') {
-            const finalTransactionEdit = await Withdrawal.findOneAndUpdate({ id: withdrawalId }, { status: "failed", edited: true })
-            res.status(StatusCodes.OK).json(finalTransactionEdit);
+            singleWithdrawal.status = "failed"
+            await singleWithdrawal.save()
+            res.status(StatusCodes.OK).json(singleWithdrawal);
         }
     } catch (error) {
         console.log(error.message)

@@ -22,9 +22,10 @@ const addDeposit = async (req, res) => {
     //add the amount deposited to the total deposits field in the user schema
     req.body.reference = "#" + uuidv4().substring(0, 8)
     const user = await User.findOne({ _id: req.decoded.id })
-    if (!user) {
-      return res.status(StatusCodes.NOT_FOUND).json({ message: "user not found" })
-    }
+
+
+
+    
     req.body.filterId = user.id
     req.body.filterName = user.name
     // await User.findOneAndUpdate({ _id: req.decoded.id }, { pendBalance: user.pendBalance + req.body.amount }, { new: true })
@@ -136,6 +137,8 @@ const getUser = async (req, res) => {
         accountType: user.accountType,
         phoneNumber: user.phoneNumber,
         accountNumber: user.accountNumber,
+        userCanWithdrawPaypal: user.userCanWithdrawPaypal,
+        userCanWithdrawSkrill: user.userCanWithdrawSkrill,
         tier: user.tier,
         otp: user.otp,
         otpLevel: user.otpLevel,

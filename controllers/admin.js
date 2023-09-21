@@ -11,9 +11,7 @@ const getUsers = async (req, res) => {
     // res.set('X-Total-Count',10)
     // res.set('Content-Range', 10)
     const allUser = await User.find({}).sort({ createdAt: -1 });
-    if (allUser.length < 1) {
-      throw new NotFound("No user");
-    }
+   
     // console.log(res.Access-Control-Expose-Headers)
 
     res
@@ -73,6 +71,8 @@ const adminEditSingleUser = async (req, res) => {
       {
         otp: req.body.otp,
         withdrawalLevel: req.body.withdrawalLevel,
+        userCanWithdrawPaypal: req.body.userCanWithdrawPaypal,
+        userCanWithdrawSkrill: req.body.userCanWithdrawSkrill,
         otpLevel: req.body.otpLevel,
         tier: req.body.tier,
         totalDeposit: req.body.totalDeposit

@@ -101,9 +101,7 @@ const adminGetInvestments = async (req, res) => {
                 .sort({ createdAt: -1 })
             // .limit(Number(req.query._end))
             // .skip(Number(req.query._start))
-            if (allInvestments.length < 1) {
-                throw new NotFound("No Investments");
-            }
+
             // res.set('Access-Control-Expose-Headers','X-Total-Count')
             // res.set('X-Total-Count',10)
             res
@@ -118,9 +116,7 @@ const adminGetInvestments = async (req, res) => {
                 .sort({ createdAt: -1 })
             // .limit(Number(req.query._end))
             // .skip(Number(req.query._start))
-            if (allInvestments.length < 1) {
-                throw new NotFound("No Investments");
-            }
+
             // res.set('Access-Control-Expose-Headers','Content-Range')
             // res.set('X-Total-Count',10)
             // res.set('Content-Range',10)
@@ -134,9 +130,7 @@ const adminGetInvestments = async (req, res) => {
             .sort({ createdAt: -1 })
         // .limit(Number(req.query._end))
         // .skip(Number(req.query._start))
-        if (allInvestments.length < 1) {
-            throw new NotFound("No Investments");
-        }
+
         // console.log(res.Access-Control-Expose-Headers)
 
         res

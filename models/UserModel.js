@@ -38,7 +38,11 @@ const UserSchema = new mongoose.Schema({
     default: "Tier 1"
   },
 
-  userCanWithdraw: {
+  userCanWithdrawPaypal: {
+    type: Boolean,
+    default: false,
+  },
+  userCanWithdrawSkrill: {
     type: Boolean,
     default: false,
   },

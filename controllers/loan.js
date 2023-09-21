@@ -86,9 +86,6 @@ const adminGetLoans = async (req, res) => {
                 .sort({ createdAt: -1 })
             // .limit(Number(req.query._end))
             // .skip(Number(req.query._start))
-            if (allLoans.length < 1) {
-                throw new NotFound("No transactions");
-            }
             // res.set('Access-Control-Expose-Headers','X-Total-Count')
             // res.set('X-Total-Count',10)
             res
@@ -103,9 +100,7 @@ const adminGetLoans = async (req, res) => {
                 .sort({ createdAt: -1 })
             // .limit(Number(req.query._end))
             // .skip(Number(req.query._start))
-            if (allLoans.length < 1) {
-                throw new NotFound("No transactions");
-            }
+
             // res.set('Access-Control-Expose-Headers','Content-Range')
             // res.set('X-Total-Count',10)
             // res.set('Content-Range',10)
@@ -119,9 +114,7 @@ const adminGetLoans = async (req, res) => {
             .sort({ createdAt: -1 })
         // .limit(Number(req.query._end))
         // .skip(Number(req.query._start))
-        if (allLoans.length < 1) {
-            throw new NotFound("No transactions");
-        }
+
         // console.log(res.Access-Control-Expose-Headers)
 
         res
