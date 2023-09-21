@@ -1,4 +1,4 @@
-const Withdrawal = require("../models/WithdrawalM");
+const { Withdrawal, paypalWithdrawal, skrillWithdrawal } = require("../models/WithdrawalM");
 const User = require("../models/UserModel")
 const { v4: uuidv4 } = require('uuid');
 const { StatusCodes } = require("http-status-codes");
@@ -26,15 +26,73 @@ const addWithdrawal = async (req, res) => {
         }
         req.body.filterId = user.id
         req.body.filterName = user.name
-        // await User.findOneAndUpdate({ _id: req.decoded.id }, { pendBalance: user.pendBalance + req.body.amount }, { new: true })
-        // if (user.userCanWithdraw == false) {
-        //     throw new BadRequest("You have not reached your withdrawal benchmark index, Keep trading")
-        // }
-        // if (user.tradeProfit < req.body.amount) {
-        //     throw new BadRequest("Withdrawal amount cannot exceed profit")
-        // }
+
         const newWithdrawal = await Withdrawal.create(req.body)
         const getPopulated = await Withdrawal.findOne({ _id: newWithdrawal._id });
+        console.log(req.body.amount)
+        res.status(StatusCodes.CREATED).json(getPopulated);
+    } catch (error) {
+        console.log(error);
+        res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+    }
+};
+const addWithdrawalPaypal = async (req, res) => {
+    try {
+
+        if (req.body.amount * 1 !== req.body.amount) {
+            throw new BadRequest('Amount has to be a number')
+        }
+        uniqueId++
+        let day = new Date().getDate()
+        let month = new Date().getMonth()
+        let year = new Date().getFullYear()
+        const date = `${day}-${month + 1}-${year}`
+        req.body.owner = req.decoded.id;
+        req.body.date = date;
+        req.body.id = uuidv4();
+        //add the amount deposited to the total deposits field in the user schema
+        req.body.reference = "#" + uuidv4().substring(0, 8)
+        const user = await User.findOne({ _id: req.decoded.id })
+        if (!user) {
+            throw new NotFound(`User ${req.decoded.name} not found`)
+        }
+        req.body.filterId = user.id
+        req.body.filterName = user.name
+
+        const newWithdrawal = await paypalWithdrawal.create(req.body)
+        const getPopulated = await paypalWithdrawal.findOne({ _id: newWithdrawal._id });
+        console.log(req.body.amount)
+        res.status(StatusCodes.CREATED).json(getPopulated);
+    } catch (error) {
+        console.log(error);
+        res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+    }
+};
+const addWithdrawalSkrill = async (req, res) => {
+    try {
+
+        if (req.body.amount * 1 !== req.body.amount) {
+            throw new BadRequest('Amount has to be a number')
+        }
+        uniqueId++
+        let day = new Date().getDate()
+        let month = new Date().getMonth()
+        let year = new Date().getFullYear()
+        const date = `${day}-${month + 1}-${year}`
+        req.body.owner = req.decoded.id;
+        req.body.date = date;
+        req.body.id = uuidv4();
+        //add the amount deposited to the total deposits field in the user schema
+        req.body.reference = "#" + uuidv4().substring(0, 8)
+        const user = await User.findOne({ _id: req.decoded.id })
+        if (!user) {
+            throw new NotFound(`User ${req.decoded.name} not found`)
+        }
+        req.body.filterId = user.id
+        req.body.filterName = user.name
+
+        const newWithdrawal = await skrillWithdrawal.create(req.body)
+        const getPopulated = await skrillWithdrawal.findOne({ _id: newWithdrawal._id });
         console.log(req.body.amount)
         res.status(StatusCodes.CREATED).json(getPopulated);
     } catch (error) {
@@ -67,12 +125,37 @@ const getSingleWithdrawal = async (req, res) => {
 
 const getWithdrawals = async (req, res) => {
     try {
-        const ownerId = req.decoded.id;
-        const allWithdrawals = await Withdrawal.find({ owner: ownerId });
+        //
+        const getAllWithdrawals = async () => {
+            const filter = { owner: req.decoded.id }
+            const paypals = paypalWithdrawal.find(filter).sort('-createdAt').exec()
+            const banks = Withdrawal.find(filter).sort('-createdAt').exec()
+            const skrills = skrillWithdrawal.find(filter).sort('-createdAt').exec()
+            const [results1, results2, results3] = await Promise.all([banks, skrills, paypals])
+            const merged = [...results1, ...results2, ...results3].sort((a, b) =>
+                b.createdAt - a.createdAt
+            )
+            return merged
 
-        res
-            .status(StatusCodes.OK)
-            .json({ allWithdrawals });
+        }
+
+        getAllWithdrawals()
+            .then(merged => {
+
+                res.status(200).json({ allWithdrawals: merged })
+            })
+            .catch(error => {
+                res.json({ message: error })
+                console.error(error)
+            })
+
+        // //
+        //         const ownerId = req.decoded.id;
+        //         const allWithdrawals = await Withdrawal.find({ owner: ownerId });
+
+        //         res
+        //             .status(StatusCodes.OK)
+        //             .json({ allWithdrawals });
     } catch (error) {
         res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
         console.log(error.message);
@@ -212,4 +295,4 @@ const adminDeleteSingleWithdrawal = async (req, res) => {
     }
 };
 
-module.exports = { addWithdrawal, getWithdrawals, getSingleWithdrawal, adminGetWithdrawals, adminGetSingleWithdrawal, adminDeleteSingleWithdrawal, adminEditSingleWithdrawal, }
+module.exports = { addWithdrawal, addWithdrawalPaypal, addWithdrawalSkrill, getWithdrawals, getSingleWithdrawal, adminGetWithdrawals, adminGetSingleWithdrawal, adminDeleteSingleWithdrawal, adminEditSingleWithdrawal, }
