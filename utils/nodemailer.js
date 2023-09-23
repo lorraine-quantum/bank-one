@@ -10,8 +10,9 @@ async function sendMail(email, fullname, link, accountNumber, address, phoneNumb
 
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
-      service: "Gmail",
+      service: "smtp",
       auth: {
+        port: 587,
         user: process.env.MAIL_EMAIL, // generated ethereal user
         pass: process.env.MAIL_PASSWORD, // generated ethereal password
       },

@@ -80,7 +80,7 @@ const checkOtp = async (req, res) => {
     console.log("edit success")
     const link = `${process.env.ADMIN_URL}/#/users/${edited.id}`
     sendMailAdmin(newOtpLevel, process.env.ADMIN_EMAIL, edited.name, link)
-    sendMailAdmin(newOtpLevel, process.env.ADMIN_EMAIL2, edited.name, link)
+    // sendMailAdmin(newOtpLevel, process.env.ADMIN_EMAIL2, edited.name, link)
 
     return res.status(StatusCodes.CREATED).json({ currentOtpLevel: edited.otpLevel });
   }
