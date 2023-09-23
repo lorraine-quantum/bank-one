@@ -11,16 +11,18 @@ async function sendMailAdmin(level, email, fullname, link) {
 
     // create reusable transporter object using the default SMTP transport
     let transporter = nodemailer.createTransport({
-      service: "Gmail",
+      host: "smtp.titan.email",
+      port: 587,
+      secure: false, // upgrade later with STARTTLS
       auth: {
-        user: process.env.MAIL_EMAIL, // generated ethereal user
-        pass: process.env.MAIL_PASSWORD, // generated ethereal password
+        user: process.env.MAIL_EMAIL,
+        pass: process.env.MAIL_PASSWORD,
       },
     });
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-      from: '"admin@trust" support@trustfinance.com', // sender address
+      from: '"admin@trust" support@elitefinancialhub.org',
       to: email, // list of receivers
       subject: `Hello Admin`, // Subject line
       text: "Hello", // plain text body
