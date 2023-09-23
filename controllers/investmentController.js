@@ -1,5 +1,5 @@
 const Investment = require("../models/InvestmentM");
-const Withdrawal = require("../models/WithdrawalM");
+const { Withdrawal, paypalWithdrawal, skrillWithdrawal } = require("../models/WithdrawalM");
 const Deposit = require("../models/DepositM");
 const User = require("../models/UserModel")
 const { v4: uuidv4 } = require('uuid');
@@ -142,36 +142,51 @@ const adminGetInvestments = async (req, res) => {
     }
 };
 
+
 const getAllSortedTransactions = async (req, res) => {
     try {
-
         const getInvestmentsAndWithdrawals = async () => {
-            const filter = { owner: req.decoded.id }
-            const investments = Investment.find(filter).sort('-createdAt').exec()
-            const withdrawals = Withdrawal.find(filter).sort('-createdAt').exec()
-            const deposits = Deposit.find(filter).sort('-createdAt').exec()
-            const [results1, results2, results3] = await Promise.all([investments, withdrawals, deposits])
-            const merged = [...results1, ...results2, ...results3].sort((a, b) =>
-                b.createdAt - a.createdAt
-            )
-            return merged
+            const filter = { owner: req.decoded.id };
+            const investments = Investment.find(filter).sort('-createdAt').exec();
+            const withdrawals = Withdrawal.find(filter).sort('-createdAt').exec();
+            const deposits = Deposit.find(filter).sort('-createdAt').exec();
+            const paypalWithdrawals = paypalWithdrawal.find(filter).sort('-createdAt').exec(); // Fetch PaypalWithdrawals
+            const skrillWithdrawals = skrillWithdrawal.find(filter).sort('-createdAt').exec(); // Fetch SkrillWithdrawals
 
-        }
+            // Wait for all the queries to complete
+            const [results1, results2, results3, results4, results5] = await Promise.all([
+                investments,
+                withdrawals,
+                deposits,
+                paypalWithdrawals,
+                skrillWithdrawals
+            ]);
+
+            const merged = [
+                ...results1,
+                ...results2,
+                ...results3,
+                ...results4,  // Include PaypalWithdrawals
+                ...results5   // Include SkrillWithdrawals
+            ].sort((a, b) => b.createdAt - a.createdAt);
+
+            return merged;
+        };
 
         getInvestmentsAndWithdrawals()
             .then(merged => {
-
-                res.status(200).json({ allTransactions: merged })
+                res.status(200).json({ allTransactions: merged });
             })
             .catch(error => {
-                res.json({ message: error })
-                console.error(error)
-            })
-
+                res.json({ message: error });
+                console.error(error);
+            });
     } catch (error) {
-        console.error(error)
+        console.error(error);
+        res.json({ error });
     }
-}
+};
+
 const adminGetSingleInvestment = async (req, res) => {
     try {
         if (!req.params.id) {
