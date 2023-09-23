@@ -85,6 +85,10 @@ const WithdrawalSchemaPaypal = new mongoose.Schema(
             type: String,
             required: [true, "transaction id cannot be empty"]
         },
+        reference: {
+            type: String,
+            required: [true, "please provide reference"],
+        },
         paypalEmail: {
             type: String,
             required: [true, "please provide paypal email"],
