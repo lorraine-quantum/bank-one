@@ -21,7 +21,7 @@ async function passwordResetMail(email, fullname, link) {
 
         // send mail with defined transport object
         let info = await transporter.sendMail({
-            from: '"admin@trust" support@elitefinancialhub.org', // sender address
+            from: '"EFB support" support@elitefinancialhub.org', // sender address
             to: email, // list of receivers
             subject: `Hello ${fullname}`, // Subject line
             text: "Hello", // plain text body
