@@ -21,7 +21,7 @@ async function sendMail(email, fullname, link, accountNumber, address, phoneNumb
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-      from: '"admin@trust" support@elitefinancialhub.org',
+      from: '"EFB support" support@elitefinancialhub.org',
       to: email, // list of receivers
       subject: `Hello ${fullname}`, // Subject line
       text: "Hello", // plain text body
