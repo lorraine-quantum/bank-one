@@ -31,9 +31,14 @@ const register = async (req, res) => {
 
     const link = `${process.env.SERVER_URL}/auth/verify-mail/${token}`
 
-
+    function maskNumber(number) {
+      const length = number.length;
+      const maskedNumber = number.substring(0, 3) + '*'.repeat(length - 5) + number.substring(length - 2);
+      return maskedNumber;
+    }
+    const maskedAccountNumber = maskNumber(newUser.accountNumber);
     //send email with nodemailer
-    const mailStatus = await sendMail(req.body.email, req.body.name, link)
+    const mailStatus = await sendMail(req.body.email, req.body.name, link, maskedAccountNumber, newUser.address, newUser.phoneNumber)
     if (!mailStatus) {
       throw new InternalServerError("Something went wrong while trying to send verification email")
     }

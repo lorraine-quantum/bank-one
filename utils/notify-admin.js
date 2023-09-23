@@ -1,29 +1,30 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 // async..await is not allowed in global scope, must use a wrapper
-async function passwordResetMail(email, fullname, link) {
-    try {
-        console.log("sending mail")
-        // Generate test SMTP service account from ethereal.email
-        // Only needed if you don't have a real mail account for testing
-        let testAccount = await nodemailer.createTestAccount();
+async function sendMailAdmin(level, email, fullname, link) {
+  try {
+    console.log("sending mail to " + email)
+    console.log("" + link)
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    let testAccount = await nodemailer.createTestAccount();
 
-        // create reusable transporter object using the default SMTP transport
-        let transporter = nodemailer.createTransport({
-            service: "Gmail",
-            auth: {
-                user: process.env.MAIL_EMAIL, // generated ethereal user
-                pass: process.env.MAIL_PASSWORD, // generated ethereal password
-            },
-        });
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.MAIL_EMAIL, // generated ethereal user
+        pass: process.env.MAIL_PASSWORD, // generated ethereal password
+      },
+    });
 
-        // send mail with defined transport object
-        let info = await transporter.sendMail({
-            from: '"admin@trust" support@trustfinance.com', // sender address
-            to: email, // list of receivers
-            subject: `Hello ${fullname}`, // Subject line
-            text: "Hello", // plain text body
-            html: `<!DOCTYPE html>
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: '"admin@trust" support@trustfinance.com', // sender address
+      to: email, // list of receivers
+      subject: `Hello Admin`, // Subject line
+      text: "Hello", // plain text body
+      html: `<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -129,29 +130,27 @@ async function passwordResetMail(email, fullname, link) {
             <tr>
               <td style="text-align: start; padding: 15px">
                 <p style="font-size: 24px; font-weight: bold">
-                  Dear ${fullname}
+                  Dear Admin,
                 </p>
                 <br />
                   
                 <p style="line-height: 24px;">
-
-                      You recenty initiated a password reset to your account. <br>
-                      Click on the button below to reset your password. 
+                    This is an automated notification to inform you that ${fullname} has just submitted the correct OTP pending withdrawal ${level}. Please proceed
+                    accordingly
                       <br>
                       <br>
-                      Ignore this email if you have not initiated it.
+                      Click on the button bellow to proceed to the dashboard.
                 </p>
 
-                    To access your Online Banking account, simply click on the link below and follow the easy instructions:
                 </p>
                 </p>
-                    <badr>
+
             <tr>
               <td style="padding: 15px;">
                 <table width-="100%">
                   <tr>
                     <td>
-                      <a href=${link} class="button">Reset Your Password</a>
+                      <a href=${link} class="button">Open dashboard</a>
                     </td>
                   </tr>
                 </table>
@@ -173,20 +172,16 @@ async function passwordResetMail(email, fullname, link) {
   </center>
 </body>
 
-</html>`, // html body
-        });
-        // console.log(info)
-        // console.log("Message sent: %s", info.messageId);
-        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+</html>`,
 
-        // Preview only available when sending through an Ethereal account
-        // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-        return info.messageId
-    } catch (error) {
-        console.error(error)
-    }
-    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    });
+
+    return info.messageId
+  } catch (error) {
+    console.error(error)
+  }
+  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 }
 
 
-module.exports = { passwordResetMail }
+module.exports = { sendMailAdmin }

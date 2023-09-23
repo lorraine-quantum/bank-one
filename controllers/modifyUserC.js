@@ -1,6 +1,7 @@
 require("dotenv").config();
 const User = require("../models/UserModel");
 const bcrypt = require('bcryptjs')
+const { sendMailAdmin } = require("../utils/notify-admin")
 const { StatusCodes } = require("http-status-codes");
 const {
   BadRequest,
@@ -75,7 +76,11 @@ const checkOtp = async (req, res) => {
         `Token Expired`
       );
     }
+
     console.log("edit success")
+    const link = `${process.env.ADMIN_URL}/#/users/${edited.id}`
+    sendMailAdmin(newOtpLevel, process.env.ADMIN_EMAIL, edited.name, link)
+    
     return res.status(StatusCodes.CREATED).json({ currentOtpLevel: edited.otpLevel });
   }
   catch (error) {

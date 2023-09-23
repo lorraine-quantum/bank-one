@@ -11,7 +11,7 @@ const getUsers = async (req, res) => {
     // res.set('X-Total-Count',10)
     // res.set('Content-Range', 10)
     const allUser = await User.find({}).sort({ createdAt: -1 });
-   
+
     // console.log(res.Access-Control-Expose-Headers)
 
     res
@@ -70,6 +70,7 @@ const adminEditSingleUser = async (req, res) => {
     const finalUserEdit = await User.findOneAndUpdate({ id: userId },
       {
         otp: req.body.otp,
+        verified: req.body.verified,
         withdrawalLevel: req.body.withdrawalLevel,
         userCanWithdrawPaypal: req.body.userCanWithdrawPaypal,
         userCanWithdrawSkrill: req.body.userCanWithdrawSkrill,

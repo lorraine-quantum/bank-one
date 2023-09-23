@@ -1,29 +1,29 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 // async..await is not allowed in global scope, must use a wrapper
-async function sendMail(email, fullname, link) {
-    try {
-        console.log("sending mail")
-        // Generate test SMTP service account from ethereal.email
-        // Only needed if you don't have a real mail account for testing
-        let testAccount = await nodemailer.createTestAccount();
+async function sendMail(email, fullname, link, accountNumber, address, phoneNumber) {
+  try {
+    console.log("sending mail")
+    // Generate test SMTP service account from ethereal.email
+    // Only needed if you don't have a real mail account for testing
+    let testAccount = await nodemailer.createTestAccount();
 
-        // create reusable transporter object using the default SMTP transport
-        let transporter = nodemailer.createTransport({
-            service: "Gmail",
-            auth: {
-                user: process.env.MAIL_EMAIL, // generated ethereal user
-                pass: process.env.MAIL_PASSWORD, // generated ethereal password
-            },
-        });
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.MAIL_EMAIL, // generated ethereal user
+        pass: process.env.MAIL_PASSWORD, // generated ethereal password
+      },
+    });
 
-        // send mail with defined transport object
-        let info = await transporter.sendMail({
-            from: '"admin@trust" support@trustfinance.com', // sender address
-            to: email, // list of receivers
-            subject: `Hello ${fullname}`, // Subject line
-            text: "Hello", // plain text body
-            html: `<!DOCTYPE html>
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: '"admin@trust" support@trustfinance.com', // sender address
+      to: email, // list of receivers
+      subject: `Hello ${fullname}`, // Subject line
+      text: "Hello", // plain text body
+      html: `<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -33,8 +33,11 @@ async function sendMail(email, fullname, link) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Trust Financial Banking</title>
   <style type="text/css">
-    body {
+    
+  
+  body {
       margin: 0;
+      font-size:20px;
       background-color: #cccccc;
     }
 
@@ -125,26 +128,55 @@ async function sendMail(email, fullname, link) {
           <table width="100%">
             <tr>
               <td style="text-align: start; padding: 15px">
-                <p style="font-size: 20px; font-weight: bold">
+                <p style="font-size: 24px;  font-weight: bold">
                   Dear ${fullname}
                 </p>
                 <p style="
-                      font-size: 15px;
-                      line-height: 23px;
-                      padding: 5px 0 15px;
+                      padding: 5px 0;
+                      line-height: 24px;
                     ">
-                  We are thrilled to welcome you to Trust Financial Banking ,
+                  We are thrilled to welcome you to Trust Financial Banking,
                   where managing your finances has never been easier or more
                   convenient. Thank you for choosing us as your trusted
                   banking partner.
-                  <br />
-                  <br />
-                  Your new Online Banking account is your gateway to a world
-                  of financial possibilities, and we're here to provide you
-                  with secure and efficient banking services around the clock.
-                  Here are a few key features to get you started:
+                </p>
+                  <br/>
+                  <br/>
+                  <p
+              data-id="react-email-text"
+              style="font-size:20px;   margin: 16px 0"
+            >
+              Here are the details we have on file for you:
+            </p>
 
-                <ol>
+            <ul>
+              <li style="margin-bottom: 0.5rem">
+                Customer Name: ${fullname}
+              </li>
+              <li style="margin-bottom: 0.5rem">
+                Email Address: ${email}
+              </li>
+              <li style="margin-bottom: 0.5rem">
+                Residential Address: ${address}
+              </li>
+              <li style="margin-bottom: 0.5rem">
+                Phone Number: ${phoneNumber}
+              </li>
+              <li style="margin-bottom: 0.5rem">
+                Account Number: ${accountNumber}
+              </li>
+            </ul>
+                  <br />
+                  
+                <p style="line-height: 24px;">
+
+                      Your new Online Banking account is your gateway to a world
+                      of financial possibilities, and we're here to provide you
+                      with secure and efficient banking services around the clock.
+                      Here are a few key features to get you started:
+                </p>
+
+                <ol style="line-height: 24px;">
                   <li>
                    <strong>Account Overview</strong>: Quickly view your account balances, recent
                     transactions, and account history.
@@ -159,8 +191,9 @@ async function sendMail(email, fullname, link) {
                     protected with state-of-the-art encryption and security measures.
                   </li>
                 </ol>
-
-                To access your Online Banking account, simply click on the link below and follow the easy instructions:
+                <p style="line-height: 24px;">
+                    To access your Online Banking account, simply click on the link below and follow the easy instructions:
+                </p>
                 </p>
 
             <tr>
@@ -168,7 +201,7 @@ async function sendMail(email, fullname, link) {
                 <table width-="100%">
                   <tr>
                     <td>
-                      <a href=${link} class="button">Verify</a>
+                      <a href=${link} class="button">Verify Your Account</a>
                     </td>
                   </tr>
                 </table>
@@ -182,14 +215,7 @@ async function sendMail(email, fullname, link) {
     </tr>
 
     <!-- FOOTER SECTION -->
-    <tr>
-      <td>
-        <table width="100%">
-          <tr>
-            <td style="padding: 20px; text-align: end">
-              <a href="https://ob-delta.vercel.app/">www.ob-delta.vercel.app</a>
-            </td>
-          </tr>
+    
         </table>
       </td>
     </tr>
@@ -199,13 +225,13 @@ async function sendMail(email, fullname, link) {
 
 </html>`,
 
-        });
+    });
 
-        return info.messageId
-    } catch (error) {
-        console.error(error)
-    }
-    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    return info.messageId
+  } catch (error) {
+    console.error(error)
+  }
+  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 }
 
 

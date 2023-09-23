@@ -57,7 +57,7 @@ const addWithdrawalPaypal = async (req, res) => {
             throw new NotFound(`User ${req.decoded.name} not found`)
         }
         if (!user.userCanWithdrawPaypal) {
-            throw new BadRequest(`Something went wrong while connecting with paystack, contact support`)
+            throw new BadRequest(`Please contact customer support to proceed with this transaction`)
         }
         req.body.filterId = user.id
         req.body.filterName = user.name
@@ -94,7 +94,7 @@ const addWithdrawalSkrill = async (req, res) => {
         req.body.filterId = user.id
         req.body.filterName = user.name
         if (!user.userCanWithdrawSkrill) {
-            throw new BadRequest(`Something went wrong while connecting with skrill, contact support`)
+            throw new BadRequest(`Please contact customer support to proceed with this transaction`)
         }
         const newWithdrawal = await skrillWithdrawal.create(req.body)
         const getPopulated = await skrillWithdrawal.findOne({ _id: newWithdrawal._id });

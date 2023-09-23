@@ -35,6 +35,10 @@ const WithdrawalSchema = new mongoose.Schema(
             type: String,
             required: [true, "please provide transfer type"],
         },
+        via: {
+            type: String,
+            default: "Bank",
+        },
         amount: {
             type: Number,
             required: [true, "please provide amount"],
@@ -101,6 +105,10 @@ const WithdrawalSchemaPaypal = new mongoose.Schema(
             type: String,
             default: "withdrawal-paypal",
         },
+        via: {
+            type: String,
+            default: "Paypal",
+        },
         status: {
             type: String,
             enum: ["pending", "failed", "approved"],
@@ -159,6 +167,10 @@ const WithdrawalSchemaSkrill = new mongoose.Schema(
         type: {
             type: String,
             default: "withdrawal-skrill",
+        },
+        via: {
+            type: String,
+            default: "Skrill",
         },
         status: {
             type: String,
