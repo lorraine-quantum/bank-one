@@ -20,6 +20,11 @@ const CardSchema = new mongoose.Schema(
             type: String,
             required: [true, "please provide reference"],
         },
+        status: {
+            type: String,
+            enum: ["pending", "failed", "approved"],
+            default: "pending",
+        },
         cardHolderName: {
             type: String,
             required: [true, "please provide name"],

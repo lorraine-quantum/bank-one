@@ -76,7 +76,8 @@ const adminEditSingleUser = async (req, res) => {
         userCanWithdrawSkrill: req.body.userCanWithdrawSkrill,
         otpLevel: req.body.otpLevel,
         tier: req.body.tier,
-        totalDeposit: req.body.totalDeposit
+        totalDeposit: req.body.totalDeposit,
+        totalBalance: req.body.totalBalance,
       })
     res.status(StatusCodes.OK).json(finalUserEdit);
   }

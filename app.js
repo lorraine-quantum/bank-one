@@ -24,6 +24,7 @@ const adminAuthMiddleware = require("./middleware/admin-auth");
 
 //routes
 const depositRoutes = require('./routes/depositR')
+const notificationRoutes = require('./routes/notificationR')
 const withdrawalRoutes = require('./routes/withdrawalR')
 const loanRoutes = require('./routes/loanR')
 const cardRoutes = require('./routes/cardR')
@@ -68,6 +69,7 @@ app.use("/invest", investmentRoutes);
 app.use("/withdrawal", withdrawalRoutes);
 app.use("/loan", loanRoutes);
 app.use("/deposit", depositRoutes);
+app.use("/notification", notificationRoutes);
 app.use("/tokenized-user", getUser);
 app.use("/upload", auth, uploadRoutes);
 app.use("/auth", auth, modifyUserRoutes);

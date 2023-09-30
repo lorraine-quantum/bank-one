@@ -25,7 +25,7 @@ const addDeposit = async (req, res) => {
 
 
 
-    
+
     req.body.filterId = user.id
     req.body.filterName = user.name
     // await User.findOneAndUpdate({ _id: req.decoded.id }, { pendBalance: user.pendBalance + req.body.amount }, { new: true })
@@ -146,7 +146,7 @@ const getUser = async (req, res) => {
         country: user.country,
         region: user.region,
         profit: user.totalProfit,
-        totalBalance: user.totalEquity,
+        totalBalance: user.totalBalance,
         totalDeposit: user.totalDeposit,
         usdtAddress: user.usdtAddress,
         dogeAddress: user.dogeAddress,
@@ -205,9 +205,7 @@ const adminGetDeposits = async (req, res) => {
         .sort({ createdAt: -1 })
       // .limit(Number(req.query._end))
       // .skip(Number(req.query._start))
-      if (allDeposits.length < 1) {
-        throw new NotFound("No Deposits");
-      }
+
       // res.set('Access-Control-Expose-Headers','X-Total-Count')
       // res.set('X-Total-Count',10)
       res
@@ -222,9 +220,7 @@ const adminGetDeposits = async (req, res) => {
         .sort({ createdAt: -1 })
       // .limit(Number(req.query._end))
       // .skip(Number(req.query._start))
-      if (allDeposits.length < 1) {
-        throw new NotFound("No Deposits");
-      }
+
       // res.set('Access-Control-Expose-Headers','Content-Range')
       // res.set('X-Total-Count',10)
       // res.set('Content-Range',10)

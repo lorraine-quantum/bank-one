@@ -8,8 +8,6 @@ const { getRandom12DigitNumber, formatAsCreditCard } = require('../utils/card-nu
 let uniqueId = 0
 const addCard = async (req, res) => {
     try {
-
-
         uniqueId++
         //add the amount deposited to the total deposits field in the user schema
         const user = await User.findOne({ _id: req.decoded.id })
@@ -17,10 +15,16 @@ const addCard = async (req, res) => {
         if (existingCard) {
             return res.status(StatusCodes.CONFLICT).json({ message: `You already have a ${req.body.cardType} card` })
         }
-
+        let cardAmount = 25
         if (!user) {
             throw new NotFound(`User ${req.decoded.name} not found`)
         }
+        if (user.totalBalance < cardAmount) {
+            throw new BadRequest(`Insufficient balance, this card costs $${cardAmount}`)
+        }
+        user.totalBalance = user.totalBalance - cardAmount;
+        await user.save()
+
         req.body.owner = req.decoded.id;
         req.body.id = uuidv4();
 
@@ -71,7 +75,7 @@ const getSingleCard = async (req, res) => {
         }).populate({ path: "owner", model: "user" });
         if (!singleCard) {
             throw new NotFound(
-                `no transaction with id ${CardId} for ${req.decoded.name}`
+                `no card with id ${CardId} for ${req.decoded.name}`
             );
         }
         res.status(StatusCodes.OK).json(singleCard);
@@ -88,6 +92,7 @@ const getCards = async (req, res) => {
             return {
                 expiryDate: newCard.expiryDate,
                 cardType: newCard.cardType,
+                status: newCard.status,
                 cardNumber: newCard.cardNumber,
                 cardHolderName: newCard.cardHolderName,
                 cvcCode: newCard.cvcCode,
@@ -146,9 +151,7 @@ const adminGetCards = async (req, res) => {
             .sort({ createdAt: -1 })
         // .limit(Number(req.query._end))
         // .skip(Number(req.query._start))
-        if (allCards.length < 1) {
-            throw new NotFound("No transactions");
-        }
+
         // console.log(res.Access-Control-Expose-Headers)
 
         res
