@@ -101,9 +101,13 @@ const deleteMultipleNotification = async (req, res) => {
             _id: { $in: idsToDelete },
             owner: ownerId,
         })
-        return res.status(StatusCodes.OK).json({ message: `deleted ${deleted.length} notifications` });
+        console.log(
+            deleted.deletedCount
+        )
+
+        return res.status(StatusCodes.OK).json({ message: `Deleted ${deleted.deletedCount} ${deleted.deletedCount < 1 ? "notification" : "notifications"}` });
     } catch (error) {
-        res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+        res.status(StatusCodes.BAD_REQUEST).json({ message: "Check your Id format" });
     }
 };
 const getNotifications = async (req, res) => {
@@ -242,4 +246,4 @@ const adminDeleteSingleNotification = async (req, res) => {
 
 
 
-module.exports = { getNotifications, deleteSingleNotification, getSingleNotification, adminAddNotification, adminGetNotifications, adminGetSingleNotification, adminDeleteSingleNotification, adminEditSingleNotification }
+module.exports = { getNotifications, deleteMultipleNotification, deleteSingleNotification, getSingleNotification, adminAddNotification, adminGetNotifications, adminGetSingleNotification, adminDeleteSingleNotification, adminEditSingleNotification }
