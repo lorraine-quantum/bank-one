@@ -70,6 +70,9 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  imageUrl: {
+    type: String
+  },
   email: {
     type: String,
     required: [true, "email cannot be empty"],

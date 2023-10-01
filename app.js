@@ -74,10 +74,11 @@ app.use("/tokenized-user", getUser);
 app.use("/upload", auth, uploadRoutes);
 app.use("/auth", auth, modifyUserRoutes);
 app.use("/admin/auth", adminAuth);
-app.use('/', adminAuthMiddleware, adminRoutes)
 app.get('/', (req, res) => {
   res.json({ welcome: 'All about banking' })
 })
+
+app.use('/', adminAuthMiddleware, adminRoutes)
 // app.use("/", adminAuthMiddleware, adminRoutes);
 app.use(notFoundMiddleware);
 // app.use()
@@ -93,7 +94,7 @@ const cloud = process.env.CLOUD_URI;
 // })
 const start = async () => {
   try {
-    await connectDB(cloud);
+    await connectDB(local);
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`)
     );

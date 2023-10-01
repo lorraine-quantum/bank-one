@@ -1,5 +1,6 @@
 require("dotenv").config();
 const User = require("../models/UserModel");
+const { uploadId } = require("../controllers/uploadIdC")
 const bcrypt = require('bcryptjs')
 const { sendMailAdmin } = require("../utils/notify-admin")
 const { StatusCodes } = require("http-status-codes");
@@ -9,34 +10,55 @@ const {
   Unauthenticated,
 } = require("../errors/customErrors");
 const editUser = async (req, res) => {
-  console.log("inside editUse")
-  try {
-    if (req.body.password || req.body.email) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: "email and password are immutable"
-      })
-    }
-    const ownerId = req.decoded.id;
-    const edited = await User.findOneAndUpdate(
-      {
-        _id: ownerId,
-      },
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!edited) {
-      throw new NotFound(
-        `Token Expired`
+  uploadId(req, res, async (err) => {
+    try {
+      function isObjectEmpty(obj) {
+        for (const key in obj) {
+          if (obj[key] !== null && obj[key] !== undefined && obj[key] !== '') {
+            return false;
+          }
+        }
+        return true;
+      }
+      if (!req.file && isObjectEmpty(req.body)) {
+        throw new BadRequest("The request body cannot be empty")
+      }
+
+      if (req.body.password || req.body.email || req.body.name) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          message: "Name, email and password are immutable"
+        })
+      }
+
+      const ownerId = req.decoded.id;
+      const edited = await User.findOneAndUpdate(
+        {
+          _id: ownerId,
+        },
+        req.body,
+        { new: true, runValidators: true }
       );
+
+      if (req.fileValidationError) {
+        return res.json({ message: req.fileValidationError })
+      }
+
+
+      if (req.file) {
+        console.log(req.file.filename, "filename")
+        const apiBaseUrl = `${req.protocol}://${req.get('host')}`
+        const imageUrl = `${apiBaseUrl}/public/uploads/${req.file.filename}`
+        const updatedUser = await User.findOneAndUpdate({ _id: ownerId }, { imageUrl }, { new: true })
+        // res.json({ redirecturl: `${apiBaseUrl}/public/uploads/${req.file.filename}` })            // return res.redirect(`${apiBaseUrl}/public/uploads/${req.file.filename}`)
+      }
     }
-    console.log("edit success")
-    return res.status(StatusCodes.CREATED).json({ message: "Profile Updated" });
-  }
-  catch (error) {
-    console.log("in edit error")
-    return res.status(StatusCodes.BAD_REQUEST).json({ message: error.message })
-  }
+    catch (err) {
+      console.log(err.message);
+      return res.status(StatusCodes.BAD_REQUEST).json({ err: err.message })
+    }
+  })
 };
+
 const checkOtp = async (req, res) => {
   console.log("inside editToken")
   try {

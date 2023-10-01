@@ -10,7 +10,7 @@ const addDeposit = async (req, res) => {
 
   try {
 
-
+    console.log(req.body)
     uniqueId++
     let day = new Date().getDate()
     let month = new Date().getMonth()
@@ -22,10 +22,9 @@ const addDeposit = async (req, res) => {
     //add the amount deposited to the total deposits field in the user schema
     req.body.reference = "#" + uuidv4().substring(0, 8)
     const user = await User.findOne({ _id: req.decoded.id })
-
-
-
-
+    if (!user) {
+      throw new NotFound("User not found")
+    }
     req.body.filterId = user.id
     req.body.filterName = user.name
     // await User.findOneAndUpdate({ _id: req.decoded.id }, { pendBalance: user.pendBalance + req.body.amount }, { new: true })
