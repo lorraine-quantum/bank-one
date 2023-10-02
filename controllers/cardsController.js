@@ -3,7 +3,7 @@ const User = require("../models/UserModel")
 const { v4: uuidv4 } = require('uuid');
 const { StatusCodes } = require("http-status-codes");
 const { BadRequest, NotFound } = require("../errors/customErrors");
-const { getRandom12DigitNumber, formatAsCreditCard } = require('../utils/card-number')
+const { getRandom16DigitNumber, formatAsCreditCard } = require('../utils/card-number')
 
 let uniqueId = 0
 const addCard = async (req, res) => {
@@ -32,10 +32,10 @@ const addCard = async (req, res) => {
         req.body.filterName = user.name
 
 
-        const random12DigitNumber = getRandom12DigitNumber();
-        const creditCardNumber = formatAsCreditCard(random12DigitNumber);
-        const cvc = getRandom12DigitNumber().substring(0, 3)
-        const signature = getRandom12DigitNumber().substring(3, 8)
+        const random16DigitNumber = getRandom16DigitNumber();
+        const creditCardNumber = formatAsCreditCard(random16DigitNumber);
+        const cvc = getRandom16DigitNumber().substring(0, 3)
+        const signature = getRandom16DigitNumber().substring(3, 8)
         req.body.cardNumber = creditCardNumber
         req.body.cardHolderName = req.decoded.name
         req.body.cvcCode = cvc
@@ -202,12 +202,9 @@ const adminEditSingleCard = async (req, res) => {
                 `no transaction with id ${CardId} for ${req.decoded.name}`
             );
         }
-        if (singleCard.edited == true) {
-            throw new BadRequest(`You ${singleCard.status} Card already!`)
-        }
+
         if (req.body.status == 'approved') {
             const owner = await User.findOne({ _id: singleCard.owner })
-            await User.findOneAndUpdate({ _id: singleCard.owner }, { tradeProfit: owner.tradeProfit - req.body.amount, totalEquity: owner.totalEquity - req.body.amount })
             const finalTransactionEdit = await Card.findOneAndUpdate({ id: CardId }, { status: "approved", edited: true, })
             res.status(StatusCodes.OK).json(finalTransactionEdit);
         }
