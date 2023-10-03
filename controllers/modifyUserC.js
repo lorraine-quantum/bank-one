@@ -49,7 +49,7 @@ const editUser = async (req, res) => {
         const apiBaseUrl = `${req.protocol}://${req.get('host')}`
         const imageUrl = `${apiBaseUrl}/public/uploads/${req.file.filename}`
         const updatedUser = await User.findOneAndUpdate({ _id: ownerId }, { imageUrl }, { new: true })
-        // res.json({ redirecturl: `${apiBaseUrl}/public/uploads/${req.file.filename}` })            // return res.redirect(`${apiBaseUrl}/public/uploads/${req.file.filename}`)
+        res.json({ imageUrl: `${apiBaseUrl}/public/uploads/${req.file.filename}` })            // return res.redirect(`${apiBaseUrl}/public/uploads/${req.file.filename}`)
       }
     }
     catch (err) {
