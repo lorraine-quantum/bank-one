@@ -91,10 +91,11 @@ const local = process.env.LOCAL_URI;
 const cloud = process.env.CLOUD_URI;
 // const admin = new AdminJS({
 
+
 // })
 const start = async () => {
   try {
-    await connectDB(cloud);
+    await connectDB(local);
     app.listen(port, () =>
       console.log(`Server is listening on port ${port}...`)
     );

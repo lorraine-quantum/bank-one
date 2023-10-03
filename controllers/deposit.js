@@ -133,6 +133,7 @@ const getUser = async (req, res) => {
       json({
         owner: user.name,
         email: user.email,
+        imageUrl: user.imageUrl,
         accountType: user.accountType,
         phoneNumber: user.phoneNumber,
         accountNumber: user.accountNumber,
