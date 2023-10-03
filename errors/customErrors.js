@@ -28,6 +28,12 @@ class InternalServerError extends Error {
     this.statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
   }
 }
+class Conflict extends Error {
+  constructor(Message) {
+    super(Message);
+    this.statusCode = StatusCodes.CONFLICT;
+  }
+}
 
 
-module.exports = { BadRequest, Unauthenticated, NotFound, InternalServerError };
+module.exports = { BadRequest, Unauthenticated, NotFound, InternalServerError, Conflict };

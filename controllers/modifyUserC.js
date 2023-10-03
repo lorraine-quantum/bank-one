@@ -8,6 +8,7 @@ const {
   BadRequest,
   NotFound,
   Unauthenticated,
+  Conflict
 } = require("../errors/customErrors");
 const editUser = async (req, res) => {
   uploadId(req, res, async (err) => {
@@ -201,9 +202,21 @@ const getUser = async (req, res) => {
 const loggedInUpdatePassword = async (req, res) => {
   try {
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt)
-
-    // const user = 
+    if (!req.body.newPassword || !req.body.oldPassword) {
+      throw new BadRequest("Supply old and new passwords")
+    }
+    if (req.body.oldPassword == req.body.newPassword) {
+      throw new Conflict("You cannot use the same password")
+    }
+    const hashedPassword = await bcrypt.hash(req.body.newPassword, salt)
+    const user = await User.findById(req.decoded.id)
+    if (!user) {
+      throw new NotFound("User does not exist")
+    }
+    const isMatch = await user.comparePassword(req.body.oldPassword);
+    if (!isMatch) {
+      throw new Unauthenticated("Your old password is incorrect");
+    }
     const edited = await User.findOneAndUpdate(
       {
         _id: req.decoded.id,
@@ -211,7 +224,7 @@ const loggedInUpdatePassword = async (req, res) => {
       { password: hashedPassword },
       { new: true, runValidators: true }
     );
-    res.json({ message: "Password Reset Successful" })
+    res.json({ message: "Password Update Successful" })
   } catch (error) {
     console.error(error)
     res.status(StatusCodes.BAD_REQUEST).json({ error: error.message })
