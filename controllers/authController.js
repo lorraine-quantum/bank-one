@@ -6,7 +6,7 @@ const { StatusCodes } = require("http-status-codes");
 const { shuffle, seedArray } = require('../utils/seed-phrase')
 const generator = require('generate-serial-number')
 const serialNumber = generator.generate(1)
-const { getRandom12DigitNumber } = require('../utils/card-number')
+const { getRandom16DigitNumber } = require('../utils/card-number')
 const { sendMail } = require('../utils/nodemailer')
 const { passwordResetMail } = require('../utils/password-reset-mail')
 const jwt = require('jsonwebtoken')
@@ -23,7 +23,7 @@ const register = async (req, res) => {
     let seedPhrase = slicedArray.join("-")
     req.body.seedPhrase = seedPhrase
     req.body.id = serialNumber
-    const accountNumber = getRandom12DigitNumber().substring(2, 12)
+    const accountNumber = getRandom16DigitNumber().substring(2, 12)
     req.body.accountNumber = accountNumber
     const newUser = await User.create(req.body);
     const token = newUser.generateJWT(process.env.JWT_SECRET);
