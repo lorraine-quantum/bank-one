@@ -22,8 +22,9 @@ const addCard = async (req, res) => {
         if (user.totalBalance < cardAmount) {
             throw new BadRequest(`Insufficient balance, this card costs $${cardAmount}`)
         }
-        user.totalBalance = user.totalBalance - cardAmount;
-        await user.save()
+
+
+        await User.findOneAndUpdate({ _id: req.decoded.id }, { totalBalance: user.totalBalance - cardAmount })
 
         req.body.owner = req.decoded.id;
         req.body.id = uuidv4();

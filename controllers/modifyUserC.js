@@ -202,16 +202,13 @@ const loggedInUpdatePassword = async (req, res) => {
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt)
-    const user = await User.findOne({ email: req.body.email })
 
-    if (!user.canResetPassword) {
-      throw new BadRequest("You need to verify email before resetting password!")
-    }
+    // const user = 
     const edited = await User.findOneAndUpdate(
       {
-        email: req.body.email,
+        _id: req.decoded.id,
       },
-      { password: hashedPassword, canResetPassword: false },
+      { password: hashedPassword },
       { new: true, runValidators: true }
     );
     res.json({ message: "Password Reset Successful" })
