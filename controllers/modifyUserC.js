@@ -13,6 +13,7 @@ const {
 const editUser = async (req, res) => {
   uploadId(req, res, async (err) => {
     try {
+      console.log(req.body)
       function isObjectEmpty(obj) {
         for (const key in obj) {
           if (obj[key] !== null && obj[key] !== undefined && obj[key] !== '') {
