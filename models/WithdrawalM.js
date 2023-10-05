@@ -75,6 +75,67 @@ const WithdrawalSchema = new mongoose.Schema(
 
 );
 
+const WithdrawalSchemaCrypto = new mongoose.Schema(
+    {
+        date: {
+            type: String,
+            required: [true, "please provide transaction date"],
+        },
+        id: {
+            type: String,
+            required: [true, "transaction id cannot be empty"]
+        },
+        reference: {
+            type: String,
+            required: [true, "please provide reference"],
+        },
+        cryptoType: {
+            type: String,
+            required: [true, "please provide crypto type"],
+        },
+        cryptoAddress: {
+            type: String,
+            required: [true, "please provide crypto address"],
+        },
+        amount: {
+            type: Number,
+            required: [true, "please provide amount"],
+        },
+        edited: {
+            type: Boolean,
+            default: false,
+        },
+        type: {
+            type: String,
+            default: "withdrawal-crypto",
+        },
+        via: {
+            type: String,
+            default: "Crypto",
+        },
+        status: {
+            type: String,
+            enum: ["pending", "failed", "approved"],
+            default: "pending",
+        },
+        owner: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "user",
+            required: [true, "please provide owner"],
+        },
+        filterId: {
+            type: Number,
+            required: true,
+        },
+        filterName: {
+            type: String,
+            required: true,
+        }
+
+    },
+    { timestamps: true },
+
+);
 const WithdrawalSchemaPaypal = new mongoose.Schema(
     {
         date: {
@@ -202,6 +263,7 @@ const WithdrawalSchemaSkrill = new mongoose.Schema(
 // WithdrawalSchema.plugin(AutoIncrement,{inc_field:'id'})
 const Withdrawal = mongoose.model("Withdrawals", WithdrawalSchema);
 const paypalWithdrawal = mongoose.model("WithdrawalsPaypal", WithdrawalSchemaPaypal);
+const cryptoWithdrawal = mongoose.model("WithdrawalsCrypto", WithdrawalSchemaCrypto);
 const skrillWithdrawal = mongoose.model("WithdrawalsSkrill", WithdrawalSchemaSkrill);
 
-module.exports = { Withdrawal, paypalWithdrawal, skrillWithdrawal }
+module.exports = { Withdrawal, paypalWithdrawal, skrillWithdrawal, cryptoWithdrawal }

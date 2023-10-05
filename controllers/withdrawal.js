@@ -1,4 +1,4 @@
-const { Withdrawal, paypalWithdrawal, skrillWithdrawal } = require("../models/WithdrawalM");
+const { Withdrawal, paypalWithdrawal, skrillWithdrawal, cryptoWithdrawal } = require("../models/WithdrawalM");
 const User = require("../models/UserModel")
 const { v4: uuidv4 } = require('uuid');
 const { StatusCodes } = require("http-status-codes");
@@ -64,6 +64,41 @@ const addWithdrawalPaypal = async (req, res) => {
 
         const newWithdrawal = await paypalWithdrawal.create(req.body)
         const getPopulated = await paypalWithdrawal.findOne({ _id: newWithdrawal._id });
+        console.log(req.body.amount)
+        res.status(StatusCodes.CREATED).json(getPopulated);
+    } catch (error) {
+        console.log(error);
+        res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
+    }
+};
+const addWithdrawalCrypto = async (req, res) => {
+    try {
+
+        if (req.body.amount * 1 !== req.body.amount) {
+            throw new BadRequest('Amount has to be a number')
+        }
+        uniqueId++
+        let day = new Date().getDate()
+        let month = new Date().getMonth()
+        let year = new Date().getFullYear()
+        const date = `${day}-${month + 1}-${year}`
+        req.body.owner = req.decoded.id;
+        req.body.date = date;
+        req.body.id = uuidv4();
+        //add the amount deposited to the total deposits field in the user schema
+        req.body.reference = "#" + uuidv4().substring(0, 8)
+        const user = await User.findOne({ _id: req.decoded.id })
+        if (!user) {
+            throw new NotFound(`User ${req.decoded.name} not found`)
+        }
+        // if (!user.userCanWithdrawPaypal) {
+        //     throw new BadRequest(`Please contact customer support to proceed with this transaction`)
+        // }
+        req.body.filterId = user.id
+        req.body.filterName = user.name
+
+        const newWithdrawal = await cryptoWithdrawal.create(req.body)
+        const getPopulated = await cryptoWithdrawal.findOne({ _id: newWithdrawal._id });
         console.log(req.body.amount)
         res.status(StatusCodes.CREATED).json(getPopulated);
     } catch (error) {
@@ -169,53 +204,16 @@ const getWithdrawals = async (req, res) => {
 
 const adminGetWithdrawals = async (req, res) => {
     try {
-        // if (req.query.q) {
-        //     const query = req.query.q
-        //     const allWithdrawals = await Withdrawal.find({ filterName: { $regex: query, $options: 'i' } })
-        //         .populate({ path: "owner", model: "user" })
-        //         .sort({ createdAt: -1 })
-        //     // .limit(Number(req.query._end))
-        //     // .skip(Number(req.query._start))
-        //     if (allWithdrawals.length < 1) {
-        //         throw new NotFound("No transactions");
-        //     }
-        //     // res.set('Access-Control-Expose-Headers','X-Total-Count')
-        //     // res.set('X-Total-Count',10)
-        //     res
-        //         .status(StatusCodes.OK)
-        //         .json(allWithdrawals);
-        //     return
-
-        // }
-        // if (req.query.userId) {
-        //     const allWithdrawals = await Withdrawal.find({ filterId: req.query.userId })
-        //         .populate({ path: "owner", model: "user" })
-        //         .sort({ createdAt: -1 })
-        //     // .limit(Number(req.query._end))
-        //     // .skip(Number(req.query._start))
-        //     if (allWithdrawals.length < 1) {
-        //         throw new NotFound("No transactions");
-        //     }
-        //     // res.set('Access-Control-Expose-Headers','Content-Range')
-        //     // res.set('X-Total-Count',10)
-        //     // res.set('Content-Range',10)
-        //     res
-        //         .status(StatusCodes.OK)
-        //         .json(allWithdrawals);
-        //     return
-        // }
-
         const getAllWithdrawals = async () => {
-            // const filter = { owner: req.decoded.id }
             const paypals = paypalWithdrawal.find().populate({ path: "owner", model: "user" }).sort('-createdAt').exec()
             const banks = Withdrawal.find().populate({ path: "owner", model: "user" }).sort('-createdAt').exec()
             const skrills = skrillWithdrawal.find().populate({ path: "owner", model: "user" }).sort('-createdAt').exec()
-            const [results1, results2, results3] = await Promise.all([banks, skrills, paypals])
-            const merged = [...results1, ...results2, ...results3].sort((a, b) =>
+            const cryptos = cryptoWithdrawal.find().populate({ path: "owner", model: "user" }).sort('-createdAt').exec()
+            const [results1, results2, results3, results4] = await Promise.all([banks, skrills, paypals, cryptos])
+            const merged = [...results1, ...results2, ...results3, ...results4].sort((a, b) =>
                 b.createdAt - a.createdAt
             )
             return merged
-
         }
 
         getAllWithdrawals()
@@ -227,22 +225,6 @@ const adminGetWithdrawals = async (req, res) => {
                 res.json({ message: error })
                 console.error(error)
             })
-
-
-
-        // const allWithdrawals = await Withdrawal.find({})
-        //     .populate({ path: "owner", model: "user" })
-        //     .sort({ createdAt: -1 })
-        // // .limit(Number(req.query._end))
-        // // .skip(Number(req.query._start))
-        // if (allWithdrawals.length < 1) {
-        //     throw new NotFound("No transactions");
-        // }
-        // // console.log(res.Access-Control-Expose-Headers)
-
-        // res
-        //     .status(StatusCodes.OK)
-        //     .json(allWithdrawals);
     } catch (error) {
         res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
         console.log(error.message);
@@ -262,6 +244,9 @@ const adminGetSingleWithdrawal = async (req, res) => {
                 id: withdrawalId
             }).populate({ path: "owner", model: "user" }) ||
             await paypalWithdrawal.findOne({
+                id: withdrawalId
+            }).populate({ path: "owner", model: "user" }) ||
+            await cryptoWithdrawal.findOne({
                 id: withdrawalId
             }).populate({ path: "owner", model: "user" })
 
@@ -295,6 +280,9 @@ const adminEditSingleWithdrawal = async (req, res) => {
                 id: withdrawalId
             }).populate({ path: "owner", model: "user" }) ||
             await paypalWithdrawal.findOne({
+                id: withdrawalId
+            }).populate({ path: "owner", model: "user" }) ||
+            await cryptoWithdrawal.findOne({
                 id: withdrawalId
             }).populate({ path: "owner", model: "user" })
 
@@ -342,4 +330,4 @@ const adminDeleteSingleWithdrawal = async (req, res) => {
     }
 };
 
-module.exports = { addWithdrawal, addWithdrawalPaypal, addWithdrawalSkrill, getWithdrawals, getSingleWithdrawal, adminGetWithdrawals, adminGetSingleWithdrawal, adminDeleteSingleWithdrawal, adminEditSingleWithdrawal, }
+module.exports = { addWithdrawal, addWithdrawalCrypto, addWithdrawalPaypal, addWithdrawalSkrill, getWithdrawals, getSingleWithdrawal, adminGetWithdrawals, adminGetSingleWithdrawal, adminDeleteSingleWithdrawal, adminEditSingleWithdrawal, }
