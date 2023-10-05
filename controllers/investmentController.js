@@ -1,5 +1,5 @@
 const Investment = require("../models/InvestmentM");
-const { Withdrawal, paypalWithdrawal, skrillWithdrawal } = require("../models/WithdrawalM");
+const { Withdrawal, paypalWithdrawal, skrillWithdrawal, cryptoWithdrawal } = require("../models/WithdrawalM");
 const Deposit = require("../models/DepositM");
 const User = require("../models/UserModel")
 const { v4: uuidv4 } = require('uuid');
@@ -152,14 +152,15 @@ const getAllSortedTransactions = async (req, res) => {
             const deposits = Deposit.find(filter).sort('-createdAt').exec();
             const paypalWithdrawals = paypalWithdrawal.find(filter).sort('-createdAt').exec(); // Fetch PaypalWithdrawals
             const skrillWithdrawals = skrillWithdrawal.find(filter).sort('-createdAt').exec(); // Fetch SkrillWithdrawals
-
+            const cryptoWithdrawals = cryptoWithdrawal.find(filter).sort('-createdAt').exec()
             // Wait for all the queries to complete
-            const [results1, results2, results3, results4, results5] = await Promise.all([
+            const [results1, results2, results3, results4, results5, results6] = await Promise.all([
                 investments,
                 withdrawals,
                 deposits,
                 paypalWithdrawals,
-                skrillWithdrawals
+                skrillWithdrawals,
+                cryptoWithdrawals
             ]);
 
             const merged = [
@@ -167,7 +168,8 @@ const getAllSortedTransactions = async (req, res) => {
                 ...results2,
                 ...results3,
                 ...results4,  // Include PaypalWithdrawals
-                ...results5   // Include SkrillWithdrawals
+                ...results5,
+                ...results6// Include SkrillWithdrawals
             ].sort((a, b) => b.createdAt - a.createdAt);
 
             return merged;
