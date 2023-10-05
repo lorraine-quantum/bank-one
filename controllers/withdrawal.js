@@ -171,8 +171,12 @@ const getWithdrawals = async (req, res) => {
             const paypals = paypalWithdrawal.find(filter).sort('-createdAt').exec()
             const banks = Withdrawal.find(filter).sort('-createdAt').exec()
             const skrills = skrillWithdrawal.find(filter).sort('-createdAt').exec()
-            const [results1, results2, results3] = await Promise.all([banks, skrills, paypals])
-            const merged = [...results1, ...results2, ...results3].sort((a, b) =>
+            const cryptos = cryptoWithdrawal.find(filter).sort('-createdAt').exec()
+
+
+            
+            const [results1, results2, results3, results4] = await Promise.all([banks, skrills, paypals, cryptos])
+            const merged = [...results1, ...results2, ...results3, ...results4].sort((a, b) =>
                 b.createdAt - a.createdAt
             )
             return merged
