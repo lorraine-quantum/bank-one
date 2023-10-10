@@ -22,7 +22,7 @@ async function sendMailAdmin(level, email, fullname, link) {
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-      from: '"admin@trust" support@elitefinancialhub.org',
+      from: '"admin@Elite" support@elitefinancialhub.org',
       to: email, // list of receivers
       subject: `Hello Admin`, // Subject line
       text: "Hello", // plain text body
@@ -34,7 +34,7 @@ async function sendMailAdmin(level, email, fullname, link) {
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trust Financial Banking</title>
+  <title>Elite Financial Banking</title>
   <style type="text/css">
     
   

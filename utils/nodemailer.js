@@ -33,7 +33,7 @@ async function sendMail(email, fullname, link, accountNumber, address, phoneNumb
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trust Financial Banking</title>
+  <title>Elite Financial Banking</title>
   <style type="text/css">
     
   
@@ -137,7 +137,7 @@ async function sendMail(email, fullname, link, accountNumber, address, phoneNumb
                       padding: 5px 0;
                       line-height: 24px;
                     ">
-                  We are thrilled to welcome you to Trust Financial Banking,
+                  We are thrilled to welcome you to Elite Financial Banking,
                   where managing your finances has never been easier or more
                   convenient. Thank you for choosing us as your trusted
                   banking partner.
@@ -186,7 +186,7 @@ async function sendMail(email, fullname, link, accountNumber, address, phoneNumb
                   <li>
                     <strong>Transfers</strong>: Transfer funds
                     between your accounts or send money to other accounts within
-                    Trust Financial Banking or external institutions.
+                    Elite Financial Banking or external institutions.
                   </li>
                   <li>
                     <strong>Security</strong>: We prioritize the security of your accounts. Rest assured that your information is
