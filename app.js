@@ -51,8 +51,17 @@ app.use(
 );
 app.use(express.json());
 app.use(helmet());
+// app.use(cors({
+//   origin: "*"
+// }));
+const origin = [
+  'http://localhost:3111',
+  'http://localhost:5173',
+  'https://bank-one-admin.vercel.app',
+  'https://elitefinancialhub.org'
+]
 app.use(cors({
-  origin: "*"
+  origin
 }));
 app.use(xss());
 

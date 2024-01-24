@@ -71,6 +71,8 @@ const addWithdrawalPaypal = async (req, res) => {
         res.status(StatusCodes.BAD_REQUEST).json({ message: error.message });
     }
 };
+
+
 const addWithdrawalCrypto = async (req, res) => {
     try {
 

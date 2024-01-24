@@ -109,6 +109,9 @@ const WithdrawalSchemaCrypto = new mongoose.Schema(
             type: String,
             default: "withdrawal-crypto",
         },
+        network: {
+            type: String,
+        },
         via: {
             type: String,
             default: "Crypto",
